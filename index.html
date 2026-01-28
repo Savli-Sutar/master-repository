@@ -14,7 +14,6 @@
 </header>
 
 <nav>
-    <a href="#about">About</a>
     <a href="#dashboard">Dashboard</a>
 </nav>
 
@@ -24,7 +23,7 @@
     <div class="ai-camera-box">
         <button class="btn-main" onclick="init()">Start AI Camera</button>
         <div id="webcam-container"></div>
-        <div id="label-container"></div>
+        <div id="label-container" style="margin-top: 15px; font-weight: bold;"></div>
     </div>
 
     <div class="bin-container">
@@ -39,7 +38,7 @@
 <div id="disposalModal" class="modal">
     <div class="modal-content">
         <span class="close-btn" onclick="closeModal()">&times;</span>
-        <h2 id="wasteTitle"></h2>
+        <h2 id="wasteTitle" style="color: #2e8b57;"></h2>
         <ul id="disposalList"></ul>
         <div id="specialNote"></div>
         <button class="btn-main" onclick="closeModal()" style="margin-top:15px;">Confirm Disposal</button>
@@ -49,6 +48,5 @@
 <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest/dist/tf.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@latest/dist/teachablemachine-image.min.js"></script>
 <script src="script.js"></script>
-
 </body>
 </html>
