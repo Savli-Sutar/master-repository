@@ -38,28 +38,30 @@
             <h3>Plastic Bin</h3>
             <div class="progress"><div class="progress-fill" id="fill1"></div></div>
             <p class="ai-status" id="bin1">AI Status: Empty</p>
-            <button onclick="fillBin(1)">Add Waste</button>
         </div>
 
         <div class="bin ai-bin">
             <h3>Organic Bin</h3>
             <div class="progress"><div class="progress-fill" id="fill2"></div></div>
             <p class="ai-status" id="bin2">AI Status: Empty</p>
-            <button onclick="fillBin(2)">Add Waste</button>
         </div>
 
         <div class="bin ai-bin">
             <h3>Paper Bin</h3>
             <div class="progress"><div class="progress-fill" id="fill3"></div></div>
             <p class="ai-status" id="bin3">AI Status: Empty</p>
-            <button onclick="fillBin(3)">Add Waste</button>
         </div>
 
         <div class="bin ai-bin">
             <h3>Metal Bin</h3>
             <div class="progress"><div class="progress-fill" id="fill4"></div></div>
             <p class="ai-status" id="bin4">AI Status: Empty</p>
-            <button onclick="fillBin(4)">Add Waste</button>
+        </div>
+
+        <div class="bin ai-bin">
+            <h3>Glass Bin</h3>
+            <div class="progress"><div class="progress-fill" id="fill5"></div></div>
+            <p class="ai-status" id="bin5">AI Status: Empty</p>
         </div>
     </div>
 </section>
@@ -69,7 +71,8 @@
         <span class="close-btn" onclick="closeModal()">&times;</span>
         <h2 id="wasteTitle"></h2>
         <ul id="disposalList"></ul>
-        <button class="btn-main" onclick="closeModal()">Got it!</button>
+        <div id="specialNote"></div>
+        <button class="btn-main" onclick="closeModal()" style="margin-top:20px;">Got it!</button>
     </div>
 </div>
 
