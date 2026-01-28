@@ -1,47 +1,55 @@
-const URL = "PASTE_YOUR_NEW_URL_HERE/"; 
+// REPLACE THIS URL with your actual Teachable Machine Model link!
+const URL = "https://teachablemachine.withgoogle.com/models/CPn8HY5wC/"; 
+
 let model, webcam, labelContainer, maxPredictions;
 let wasteLog = [];
 let lastDetected = "";
 
 const disposalData = {
     "Plastic": {
-        rules: ["Rinse residues", "Remove caps", "Flatten bottle"],
-        note: "⚠️ If plastic is heavily contaminated with oil, it may not be recyclable."
+        rules: ["• Rinse containers to remove food liquid.", "• Remove caps and recycle them separately.", "• Squash bottles to save bin space.", "• Check for recycling symbols #1, #2, or #5."],
+        note: "⚠️ Heavily greased plastics should go to general waste."
     },
     "Organic": {
-        rules: ["No plastic wraps", "Remove stickers", "Compost if possible"],
-        note: "🧁 Special Case: Greasy cupcake liners and pizza boxes belong here!"
+        rules: ["• Remove plastic stickers from fruit peels.", "• Drain excess liquids before disposal.", "• Do not include plastic bags or metal ties."],
+        note: "🧁 Special Case: Used cupcake liners and pizza boxes are organic, not paper!"
     },
     "Paper": {
-        rules: ["Keep dry", "Remove tape", "Flatten cardboard"],
-        note: "⚠️ Paper must be clean. If it's greasy or wet, move it to Organic."
+        rules: ["• Ensure paper is dry and free of food stains.", "• Remove any plastic windows from envelopes.", "• Flatten cardboard boxes completely."],
+        note: "⚠️ If paper is wet or greasy, it belongs in Organic waste."
     },
     "Metal": {
-        rules: ["Clean food cans", "Recycle clean foil", "Check for sharp edges"],
-        note: "⚠️ Ensure cans are empty to avoid attracting pests."
+        rules: ["• Rinse cans to remove residue.", "• Push sharp lids inside the can safely.", "• Scrunch clean aluminium foil into a ball."],
+        note: "⚠️ Batteries and electronics go to e-waste centers, not this bin!"
     },
     "Glass": {
-        rules: ["Rinse jars and bottles", "Remove metal lids", "Keep glass intact"],
-        note: "⚠️ Note: Mirrors and light bulbs are NOT recyclable glass."
+        rules: ["• Rinse out jars and bottles thoroughly.", "• Remove metal or plastic lids.", "• Do not break glass before disposal."],
+        note: "⚠️ Mirrors and light bulbs are NOT recyclable glass."
     }
 };
 
 async function init() {
-    document.getElementById("webcam-container").innerHTML = "<p style='color:white; padding-top:140px;'>Loading Smarter AI...</p>";
-    model = await tmImage.load(URL + "model.json", URL + "metadata.json");
-    maxPredictions = model.getTotalClasses();
+    document.getElementById("webcam-container").innerHTML = "<p style='color:white; padding-top:140px;'>Loading Camera...</p>";
+    
+    try {
+        model = await tmImage.load(URL + "model.json", URL + "metadata.json");
+        maxPredictions = model.getTotalClasses();
 
-    webcam = new tmImage.Webcam(300, 300, true);
-    await webcam.setup();
-    await webcam.play();
-    window.requestAnimationFrame(loop);
+        webcam = new tmImage.Webcam(300, 300, true);
+        await webcam.setup();
+        await webcam.play();
+        window.requestAnimationFrame(loop);
 
-    document.getElementById("webcam-container").innerHTML = "";
-    document.getElementById("webcam-container").appendChild(webcam.canvas);
-    labelContainer = document.getElementById("label-container");
-    labelContainer.innerHTML = "";
-    for (let i = 0; i < maxPredictions; i++) {
-        labelContainer.appendChild(document.createElement("div"));
+        document.getElementById("webcam-container").innerHTML = "";
+        document.getElementById("webcam-container").appendChild(webcam.canvas);
+        
+        labelContainer = document.getElementById("label-container");
+        labelContainer.innerHTML = "";
+        for (let i = 0; i < maxPredictions; i++) {
+            labelContainer.appendChild(document.createElement("div"));
+        }
+    } catch (e) {
+        document.getElementById("webcam-container").innerHTML = "<p style='color:red; padding: 20px;'>Error: Camera or Model failed. Ensure URL is correct and Camera is Allowed.</p>";
     }
 }
 
@@ -102,12 +110,8 @@ function showDisposalGuide(type) {
             li.innerText = item;
             list.appendChild(li);
         });
-        if (data.note) {
-            noteBox.innerText = data.note;
-            noteBox.style.display = "block";
-        } else {
-            noteBox.style.display = "none";
-        }
+        noteBox.innerText = data.note;
+        noteBox.style.display = "block";
     }
     modal.style.display = "block";
 }
