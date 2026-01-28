@@ -1,56 +1,44 @@
-// REPLACE THIS URL with your actual Teachable Machine Model link!
-const URL = "https://teachablemachine.withgoogle.com/models/CPn8HY5wC/"; 
+const URL = "https://teachablemachine.withgoogle.com/models/qzbWj1b7y/"; 
 
 let model, webcam, labelContainer, maxPredictions;
-let wasteLog = [];
 let lastDetected = "";
 
 const disposalData = {
     "Plastic": {
-        rules: ["• Rinse containers to remove food liquid.", "• Remove caps and recycle them separately.", "• Squash bottles to save bin space.", "• Check for recycling symbols #1, #2, or #5."],
-        note: "⚠️ Heavily greased plastics should go to general waste."
+        rules: ["• Rinse containers.", "• Remove caps.", "• Squash bottles."],
+        note: "⚠️ Greasy plastic goes to General Waste."
     },
     "Organic": {
-        rules: ["• Remove plastic stickers from fruit peels.", "• Drain excess liquids before disposal.", "• Do not include plastic bags or metal ties."],
-        note: "🧁 Special Case: Used cupcake liners and pizza boxes are organic, not paper!"
+        rules: ["• No plastic bags.", "• Drain liquids.", "• Remove stickers."],
+        note: "🧁 Special Case: Cupcake liners belong here!"
     },
     "Paper": {
-        rules: ["• Ensure paper is dry and free of food stains.", "• Remove any plastic windows from envelopes.", "• Flatten cardboard boxes completely."],
-        note: "⚠️ If paper is wet or greasy, it belongs in Organic waste."
+        rules: ["• Keep it dry.", "• Flatten boxes.", "• Remove tape."],
+        note: "⚠️ Greasy pizza boxes belong in Organic."
     },
     "Metal": {
-        rules: ["• Rinse cans to remove residue.", "• Push sharp lids inside the can safely.", "• Scrunch clean aluminium foil into a ball."],
-        note: "⚠️ Batteries and electronics go to e-waste centers, not this bin!"
+        rules: ["• Rinse cans.", "• Push lids inside.", "• No electronics."],
+        note: "⚠️ Batteries are e-waste!"
     },
     "Glass": {
-        rules: ["• Rinse out jars and bottles thoroughly.", "• Remove metal or plastic lids.", "• Do not break glass before disposal."],
-        note: "⚠️ Mirrors and light bulbs are NOT recyclable glass."
+        rules: ["• Rinse jars.", "• Remove metal lids.", "• Do not break."],
+        note: "⚠️ Light bulbs are NOT recyclable glass."
     }
 };
 
 async function init() {
-    document.getElementById("webcam-container").innerHTML = "<p style='color:white; padding-top:140px;'>Loading Camera...</p>";
-    
-    try {
-        model = await tmImage.load(URL + "model.json", URL + "metadata.json");
-        maxPredictions = model.getTotalClasses();
+    document.getElementById("webcam-container").innerHTML = "<p style='color:white; padding-top:140px;'>Loading AI...</p>";
+    model = await tmImage.load(URL + "model.json", URL + "metadata.json");
+    maxPredictions = model.getTotalClasses();
 
-        webcam = new tmImage.Webcam(300, 300, true);
-        await webcam.setup();
-        await webcam.play();
-        window.requestAnimationFrame(loop);
+    webcam = new tmImage.Webcam(300, 300, true);
+    await webcam.setup();
+    await webcam.play();
+    window.requestAnimationFrame(loop);
 
-        document.getElementById("webcam-container").innerHTML = "";
-        document.getElementById("webcam-container").appendChild(webcam.canvas);
-        
-        labelContainer = document.getElementById("label-container");
-        labelContainer.innerHTML = "";
-        for (let i = 0; i < maxPredictions; i++) {
-            labelContainer.appendChild(document.createElement("div"));
-        }
-    } catch (e) {
-        document.getElementById("webcam-container").innerHTML = "<p style='color:red; padding: 20px;'>Error: Camera or Model failed. Ensure URL is correct and Camera is Allowed.</p>";
-    }
+    document.getElementById("webcam-container").innerHTML = "";
+    document.getElementById("webcam-container").appendChild(webcam.canvas);
+    labelContainer = document.getElementById("label-container");
 }
 
 async function loop() {
@@ -63,71 +51,40 @@ async function predict() {
     const prediction = await model.predict(webcam.canvas);
     for (let i = 0; i < maxPredictions; i++) {
         const p = prediction[i];
-        labelContainer.childNodes[i].innerHTML = `<b>${p.className}:</b> ${(p.probability * 100).toFixed(0)}%`;
-
-        if (p.probability > 0.95 && lastDetected !== p.className) {
+        if (p.probability > 0.92 && lastDetected !== p.className) {
             lastDetected = p.className;
-            wasteLog.push({ time: new Date().toLocaleTimeString(), type: p.className });
-
-            showDisposalGuide(p.className);
-
-            const name = p.className;
-            if (name === "Plastic") fillBin(1);
-            else if (name === "Organic") fillBin(2);
-            else if (name === "Paper") fillBin(3);
-            else if (name === "Metal") fillBin(4);
-            else if (name === "Glass") fillBin(5);
+            showModal(p.className);
+            updateBins(p.className);
         }
     }
 }
 
-function fillBin(binNo) {
-    const status = document.getElementById("bin" + binNo);
-    const fill = document.getElementById("fill" + binNo);
-    if (status.innerText.includes("Empty")) {
-        status.innerText = "AI Status: Half Filled";
-        status.style.color = "orange";
-        fill.style.width = "50%";
-    } else {
-        status.innerText = "AI Status: Full";
-        status.style.color = "red";
-        fill.style.width = "100%";
-    }
+function showModal(type) {
+    const data = disposalData[type];
+    if (!data) return;
+    document.getElementById("wasteTitle").innerText = type + " Detected";
+    const list = document.getElementById("disposalList");
+    list.innerHTML = "";
+    data.rules.forEach(r => {
+        let li = document.createElement("li");
+        li.innerText = r;
+        list.appendChild(li);
+    });
+    document.getElementById("specialNote").innerText = data.note;
+    document.getElementById("disposalModal").style.display = "block";
 }
 
-function showDisposalGuide(type) {
-    const modal = document.getElementById("disposalModal");
-    const list = document.getElementById("disposalList");
-    const noteBox = document.getElementById("specialNote");
-    
-    document.getElementById("wasteTitle").innerText = type + " Disposal Guide";
-    list.innerHTML = "";
-    
-    const data = disposalData[type];
-    if (data) {
-        data.rules.forEach(item => {
-            let li = document.createElement("li");
-            li.innerText = item;
-            list.appendChild(li);
-        });
-        noteBox.innerText = data.note;
-        noteBox.style.display = "block";
+function updateBins(type) {
+    const map = {"Plastic": 1, "Organic": 2, "Paper": 3, "Metal": 4, "Glass": 5};
+    const id = map[type];
+    if (id) {
+        document.getElementById("fill" + id).style.width = "100%";
+        document.getElementById("bin" + id).innerText = "AI Status: Full";
+        document.getElementById("bin" + id).style.color = "red";
     }
-    modal.style.display = "block";
 }
 
 function closeModal() {
     document.getElementById("disposalModal").style.display = "none";
-    setTimeout(() => { lastDetected = ""; }, 5000);
-}
-
-function downloadReport() {
-    if (wasteLog.length === 0) return alert("No scans yet!");
-    let csv = "Time,Waste Type\n" + wasteLog.map(r => `${r.time},${r.type}`).join("\n");
-    const blob = new Blob([csv], { type: 'text/csv' });
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'Waste_Report.csv';
-    a.click();
+    setTimeout(() => { lastDetected = ""; }, 3000);
 }
