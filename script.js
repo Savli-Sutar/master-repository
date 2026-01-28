@@ -1,4 +1,4 @@
-const URL = "https://teachablemachine.withgoogle.com/models/qzbWj1b7y/";
+const URL = "https://teachablemachine.withgoogle.com/models/CPn8HY5wC/";
 let model, webcam, labelContainer, maxPredictions;
 let wasteLog = [];
 let lastDetected = "";
@@ -100,3 +100,4 @@ function downloadReport() {
     a.download = 'Waste_Report.csv';
     a.click();
 }
+
