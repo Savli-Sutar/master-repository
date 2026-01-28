@@ -1,0 +1,130 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    background-color: #f4fdf4;
+}
+
+header {
+    background-color: #2e8b57;
+    color: white;
+    text-align: center;
+    padding: 20px;
+}
+
+nav {
+    background-color: #1e6f43;
+    padding: 10px;
+    text-align: center;
+}
+
+.ai-title {
+    text-align: center;
+    font-size: 26px;
+    animation: glow 2s infinite alternate;
+}
+
+@keyframes glow {
+    from {
+        text-shadow: 0 0 5px #2e8b57;
+    }
+    to {
+        text-shadow: 0 0 20px #2e8b57;
+    }
+}
+
+.ai-bin {
+    position: relative;
+    overflow: hidden;
+}
+
+.ai-bin::before {
+    content: "";
+    position: absolute;
+    top: -100%;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        transparent,
+        rgba(46, 139, 87, 0.3),
+        transparent
+    );
+    animation: scan 3s infinite;
+}
+
+@keyframes scan {
+    from { top: -100%; }
+    to { top: 100%; }
+}
+.progress {
+    width: 100%;
+    height: 15px;
+    background: #ddd;
+    border-radius: 10px;
+    margin: 10px 0;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, green, yellow, red);
+    transition: width 1s ease-in-out;
+}
+.ai-status {
+    font-weight: bold;
+    animation: blink 1.5s infinite;
+}
+
+@keyframes blink {
+    50% { opacity: 0.6; }
+}
+
+nav a {
+    color: white;
+    margin: 10px;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+section {
+    padding: 20px;
+}
+
+h2 {
+    color: #2e8b57;
+}
+
+ul li {
+    margin: 8px 0;
+}
+
+.bin {
+    background: white;
+    padding: 15px;
+    margin: 10px;
+    border-radius: 8px;
+    width: 250px;
+    display: inline-block;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+button {
+    padding: 8px 12px;
+    background-color: #2e8b57;
+    color: white;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+button:hover {
+    background-color: #256b45;
+}
+
+footer {
+    background-color: #1e6f43;
+    color: white;
+    text-align: center;
+    padding: 10px;
+}
