@@ -6,7 +6,6 @@ nav a { color: white; text-decoration: none; font-weight: bold; }
 .ai-camera-box { background: white; padding: 20px; display: inline-block; border-radius: 15px; margin: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
 #webcam-container { width: 300px; height: 300px; background: #000; border: 5px solid #2e8b57; border-radius: 10px; margin: 0 auto; overflow: hidden; }
 
-/* Probability Box Styling */
 .probability-box { margin-top: 15px; padding: 10px; background: #f9f9f9; border-radius: 8px; border: 1px solid #ddd; width: 280px; display: inline-block; text-align: left; }
 .prob-row { display: flex; justify-content: space-between; font-family: monospace; color: #2e8b57; margin-bottom: 3px; }
 
@@ -16,7 +15,7 @@ nav a { color: white; text-decoration: none; font-weight: bold; }
 .progress { width: 100%; height: 15px; background: #eee; border-radius: 10px; margin: 10px 0; overflow: hidden; }
 .progress-fill { height: 100%; width: 0%; background: #4caf50; transition: width 0.5s; }
 
-.btn-main { background: #2e8b57; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-size: 16px; }
+.btn-main { background: #2e8b57; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-size: 16px; margin: 5px; }
 
 .modal { display: none; position: fixed; z-index: 100; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); }
 .modal-content { background: white; margin: 15% auto; padding: 25px; width: 80%; max-width: 400px; border-radius: 10px; text-align: left; }
