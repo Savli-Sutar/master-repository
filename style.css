@@ -1,98 +1,157 @@
-
-const URL = "https://teachablemachine.withgoogle.com/models/CPn8HY5wC/"; 
-
-let model, webcam, labelContainer, maxPredictions;
-let lastDetected = "";
-
-const disposalData = {
-    "Plastic": {
-        rules: ["• Empty and rinse the container.", "• Remove caps and rings.", "• Squash to save space.", "• Ensure no liquid is inside."],
-        note: "⚠️ Greasy plastic (oil bottles) should go to General Waste."
-    },
-    "Organic": {
-        rules: ["• Remove plastic stickers from peels.", "• Drain excess food liquids.", "• No plastic bags allowed.", "• Eggshells and coffee grounds are okay."],
-        note: "🧁 Special Case: Greasy cupcake liners belong here!"
-    },
-    "Paper": {
-        rules: ["• Must be dry and clean.", "• Remove large staples or tape.", "• Flatten cardboard boxes.", "• No shredded paper if possible."],
-        note: "⚠️ Greasy pizza boxes or wet paper belong in Organic."
-    },
-    "Metal": {
-        rules: ["• Rinse food cans thoroughly.", "• Push lids inside the cans.", "• Scrunch clean foil into a ball.", "• Do not include electronics."],
-        note: "⚠️ Batteries are e-waste! Do not put them here."
-    },
-    "Glass": {
-        rules: ["• Rinse jars and remove lids.", "• Do not break the glass.", "• Separate by color if possible.", "• Check for metal neck rings."],
-        note: "⚠️ Mirrors and bulbs are NOT recyclable glass."
-    }
-};
-
-async function init() {
-    document.getElementById("webcam-container").innerHTML = "<p style='color:white; padding-top:140px;'>Accessing Camera...</p>";
-    
-    try {
-        model = await tmImage.load(URL + "model.json", URL + "metadata.json");
-        maxPredictions = model.getTotalClasses();
-
-        webcam = new tmImage.Webcam(300, 300, true); 
-        await webcam.setup(); // request access
-        await webcam.play();
-        window.requestAnimationFrame(loop);
-
-        document.getElementById("webcam-container").innerHTML = "";
-        document.getElementById("webcam-container").appendChild(webcam.canvas);
-        labelContainer = document.getElementById("label-container");
-    } catch (err) {
-        document.getElementById("webcam-container").innerHTML = "<p style='color:red; padding-top:100px;'>Error: Camera Blocked or Link Invalid. Please Allow Camera Access.</p>";
-        console.error(err);
-    }
+/* General Layout */
+body { 
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+    margin: 0; 
+    background-color: #f4fdf4; 
+    color: #333; 
+    line-height: 1.6;
 }
 
-async function loop() {
-    webcam.update();
-    await predict();
-    window.requestAnimationFrame(loop);
+header { 
+    background-color: #2e8b57; 
+    color: white; 
+    text-align: center; 
+    padding: 40px 20px; 
 }
 
-async function predict() {
-    const prediction = await model.predict(webcam.canvas);
-    for (let i = 0; i < maxPredictions; i++) {
-        const p = prediction[i];
-        if (p.probability > 0.90 && lastDetected !== p.className) {
-            lastDetected = p.className;
-            showModal(p.className);
-            updateBins(p.className);
-        }
-    }
+nav { 
+    background-color: #1e6f43; 
+    padding: 15px; 
+    text-align: center; 
+    position: sticky;
+    top: 0;
+    z-index: 100;
 }
 
-function showModal(type) {
-    const data = disposalData[type];
-    if (!data) return;
-    
-    document.getElementById("wasteTitle").innerText = type + " Waste Detected!";
-    const list = document.getElementById("disposalList");
-    list.innerHTML = "";
-    data.rules.forEach(r => {
-        let li = document.createElement("li");
-        li.innerText = r;
-        list.appendChild(li);
-    });
-    document.getElementById("specialNote").innerText = data.note;
-    document.getElementById("disposalModal").style.display = "block";
+nav a { 
+    color: white; 
+    margin: 0 20px; 
+    text-decoration: none; 
+    font-weight: bold; 
 }
 
-function updateBins(type) {
-    const mapping = {"Plastic": 1, "Organic": 2, "Paper": 3, "Metal": 4, "Glass": 5};
-    const id = mapping[type];
-    if (id) {
-        document.getElementById("fill" + id).style.width = "75%";
-        document.getElementById("bin" + id).innerText = "AI Status: Level High";
-        document.getElementById("bin" + id).style.color = "red";
-    }
+/* Dashboard & Camera */
+#dashboard { 
+    padding: 40px 20px; 
+    text-align: center; 
 }
 
-function closeModal() {
-    document.getElementById("disposalModal").style.display = "none";
-    setTimeout(() => { lastDetected = ""; }, 4000);
+.ai-title { 
+    font-size: 2rem; 
+    color: #2e8b57; 
+    margin-bottom: 20px;
+}
+
+.ai-camera-box { 
+    background: white;
+    display: inline-block;
+    padding: 20px;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    margin-bottom: 40px;
+}
+
+#webcam-container { 
+    margin: 15px auto; 
+    width: 300px; 
+    height: 300px; 
+    border: 8px solid #2e8b57; 
+    border-radius: 15px; 
+    background: #000; 
+    overflow: hidden;
+}
+
+/* Bin Grid System */
+.bin-container { 
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.bin { 
+    background: white; 
+    padding: 20px; 
+    border-radius: 15px; 
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    border-top: 5px solid #2e8b57;
+    transition: transform 0.3s;
+}
+
+.bin:hover { transform: translateY(-5px); }
+
+.progress { 
+    width: 100%; 
+    height: 20px; 
+    background: #e0e0e0; 
+    border-radius: 10px; 
+    margin: 15px 0; 
+    overflow: hidden; 
+}
+
+.progress-fill { 
+    height: 100%; 
+    width: 0%; 
+    background: linear-gradient(90deg, #4caf50, #81c784); 
+    transition: width 0.8s ease-in-out; 
+}
+
+/* Buttons */
+.btn-main { 
+    background-color: #2e8b57; 
+    color: white; 
+    border: none; 
+    padding: 12px 30px; 
+    font-size: 18px; 
+    border-radius: 50px; 
+    cursor: pointer; 
+    font-weight: bold;
+    transition: background 0.3s;
+}
+
+.btn-main:hover { background-color: #1e6f43; }
+
+/* Modal / Pop-up */
+.modal { 
+    display: none; 
+    position: fixed; 
+    z-index: 1000; 
+    left: 0; top: 0; 
+    width: 100%; height: 100%; 
+    background-color: rgba(0,0,0,0.7); 
+    backdrop-filter: blur(5px);
+}
+
+.modal-content { 
+    background-color: white; 
+    margin: 10% auto; 
+    padding: 30px; 
+    border-radius: 20px; 
+    width: 80%; 
+    max-width: 500px; 
+    text-align: left;
+    box-shadow: 0 5px 30px rgba(0,0,0,0.3);
+}
+
+.close-btn { 
+    float: right; 
+    font-size: 28px; 
+    font-weight: bold; 
+    cursor: pointer; 
+    color: #aaa;
+}
+
+#disposalList { 
+    padding-left: 20px; 
+}
+
+#specialNote { 
+    margin-top: 20px; 
+    padding: 15px; 
+    background: #fff3cd; 
+    border-left: 5px solid #ffc107; 
+    font-weight: bold; 
+    color: #856404;
 }
