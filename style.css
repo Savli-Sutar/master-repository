@@ -1,32 +1,32 @@
-/* Styling for the probability text */
-.probability-font {
-    font-family: 'Roboto Mono', monospace;
-    font-weight: bold;
-    color: #00ff41; /* Matrix Green */
-    background: #222;
-    padding: 2px 8px;
-    border-radius: 4px;
-    margin-left: 10px;
-    border: 1px solid #444;
-}
+body { font-family: 'Segoe UI', sans-serif; margin: 0; background-color: #f4fdf4; }
+header { background-color: #2e8b57; color: white; text-align: center; padding: 20px; }
+nav { background-color: #1e6f43; padding: 10px; text-align: center; }
+nav a { color: white; margin: 0 15px; text-decoration: none; font-weight: bold; }
 
-#webcam-container canvas {
-    border: 5px solid #3498db;
-    border-radius: 15px;
-    max-width: 100%;
-    height: auto;
-    box-shadow: 0px 10px 30px rgba(0,0,0,0.5);
-}
+.ai-title { text-align: center; font-size: 26px; animation: glow 2s infinite alternate; color: #2e8b57; }
+@keyframes glow { from { text-shadow: 0 0 5px #2e8b57; } to { text-shadow: 0 0 20px #2e8b57; } }
 
-#label-container {
-    margin-top: 20px;
-    font-size: 1.2rem;
-    color: #333;
-}
+.ai-camera-box { text-align: center; padding: 20px; }
+#webcam-container { margin: 10px auto; width: 300px; height: 300px; border: 5px solid #2e8b57; border-radius: 15px; background: #000; position: relative; overflow: hidden; }
 
-#label-container div {
-    margin-bottom: 5px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
+#webcam-container::after { content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 4px; background: #2ecc71; box-shadow: 0 0 15px #2ecc71; animation: laser 2s infinite; }
+@keyframes laser { 0% { top: 0; } 50% { top: 100%; } 100% { top: 0; } }
+
+.bin-container { display: flex; justify-content: center; flex-wrap: wrap; gap: 15px; padding: 20px; }
+.bin { background: white; padding: 15px; border-radius: 12px; width: 200px; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+
+.progress { width: 100%; height: 18px; background: #ddd; border-radius: 10px; margin: 10px 0; overflow: hidden; }
+.progress-fill { height: 100%; width: 0%; background: linear-gradient(90deg, #2ecc71, #f1c40f, #e74c3c); transition: width 0.6s; }
+
+/* Custom Glass Color */
+#fill5 { background: linear-gradient(90deg, #3498db, #2980b9); }
+
+.btn-main, .btn-report { background: #2e8b57; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-weight: bold; }
+.btn-report { background: #1e6f43; }
+
+.modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); }
+.modal-content { background: white; margin: 10% auto; padding: 25px; border-radius: 15px; width: 85%; max-width: 450px; text-align: center; }
+.close-btn { float: right; font-size: 24px; cursor: pointer; }
+#disposalList { text-align: left; }
+
+#specialNote { margin-top: 15px; padding: 10px; background-color: #fff3cd; border-left: 5px solid #ffc107; font-size: 14px; font-weight: bold; display: none; text-align: left; }
