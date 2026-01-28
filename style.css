@@ -1,33 +1,98 @@
-body { font-family: 'Segoe UI', sans-serif; margin: 0; background-color: #f4fdf4; }
-header { background-color: #2e8b57; color: white; text-align: center; padding: 20px; }
-nav { background-color: #1e6f43; padding: 10px; text-align: center; }
-nav a { color: white; margin: 0 15px; text-decoration: none; font-weight: bold; }
 
-.ai-title { text-align: center; font-size: 26px; animation: glow 2s infinite alternate; color: #2e8b57; }
-@keyframes glow { from { text-shadow: 0 0 5px #2e8b57; } to { text-shadow: 0 0 20px #2e8b57; } }
+const URL = "https://teachablemachine.withgoogle.com/models/CPn8HY5wC/"; 
 
-.ai-camera-box { text-align: center; padding: 20px; }
-#webcam-container { margin: 10px auto; width: 300px; height: 300px; border: 5px solid #2e8b57; border-radius: 15px; background: #000; position: relative; overflow: hidden; }
+let model, webcam, labelContainer, maxPredictions;
+let lastDetected = "";
 
-/* Laser Scanner Line */
-#webcam-container::after { content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 4px; background: #2ecc71; box-shadow: 0 0 15px #2ecc71; animation: laser 2s infinite; z-index: 5; }
-@keyframes laser { 0% { top: 0; } 50% { top: 100%; } 100% { top: 0; } }
+const disposalData = {
+    "Plastic": {
+        rules: ["• Empty and rinse the container.", "• Remove caps and rings.", "• Squash to save space.", "• Ensure no liquid is inside."],
+        note: "⚠️ Greasy plastic (oil bottles) should go to General Waste."
+    },
+    "Organic": {
+        rules: ["• Remove plastic stickers from peels.", "• Drain excess food liquids.", "• No plastic bags allowed.", "• Eggshells and coffee grounds are okay."],
+        note: "🧁 Special Case: Greasy cupcake liners belong here!"
+    },
+    "Paper": {
+        rules: ["• Must be dry and clean.", "• Remove large staples or tape.", "• Flatten cardboard boxes.", "• No shredded paper if possible."],
+        note: "⚠️ Greasy pizza boxes or wet paper belong in Organic."
+    },
+    "Metal": {
+        rules: ["• Rinse food cans thoroughly.", "• Push lids inside the cans.", "• Scrunch clean foil into a ball.", "• Do not include electronics."],
+        note: "⚠️ Batteries are e-waste! Do not put them here."
+    },
+    "Glass": {
+        rules: ["• Rinse jars and remove lids.", "• Do not break the glass.", "• Separate by color if possible.", "• Check for metal neck rings."],
+        note: "⚠️ Mirrors and bulbs are NOT recyclable glass."
+    }
+};
 
-.bin-container { display: flex; justify-content: center; flex-wrap: wrap; gap: 15px; padding: 20px; }
-.bin { background: white; padding: 15px; border-radius: 12px; width: 180px; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+async function init() {
+    document.getElementById("webcam-container").innerHTML = "<p style='color:white; padding-top:140px;'>Accessing Camera...</p>";
+    
+    try {
+        model = await tmImage.load(URL + "model.json", URL + "metadata.json");
+        maxPredictions = model.getTotalClasses();
 
-.progress { width: 100%; height: 18px; background: #ddd; border-radius: 10px; margin: 10px 0; overflow: hidden; }
-.progress-fill { height: 100%; width: 0%; background: linear-gradient(90deg, #2ecc71, #f1c40f, #e74c3c); transition: width 0.6s; }
+        webcam = new tmImage.Webcam(300, 300, true); 
+        await webcam.setup(); // request access
+        await webcam.play();
+        window.requestAnimationFrame(loop);
 
-/* Custom Blue for Glass Bin */
-#fill5 { background: linear-gradient(90deg, #3498db, #2980b9); }
+        document.getElementById("webcam-container").innerHTML = "";
+        document.getElementById("webcam-container").appendChild(webcam.canvas);
+        labelContainer = document.getElementById("label-container");
+    } catch (err) {
+        document.getElementById("webcam-container").innerHTML = "<p style='color:red; padding-top:100px;'>Error: Camera Blocked or Link Invalid. Please Allow Camera Access.</p>";
+        console.error(err);
+    }
+}
 
-.btn-main, .btn-report { background: #2e8b57; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-weight: bold; }
-.btn-report { background: #1e6f43; }
+async function loop() {
+    webcam.update();
+    await predict();
+    window.requestAnimationFrame(loop);
+}
 
-/* Modal Styles */
-.modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); }
-.modal-content { background: white; margin: 10% auto; padding: 25px; border-radius: 15px; width: 85%; max-width: 450px; text-align: center; position: relative; }
-.close-btn { float: right; font-size: 24px; cursor: pointer; color: #888; }
-#disposalList { text-align: left; padding-left: 20px; line-height: 1.6; }
-#specialNote { margin-top: 15px; padding: 10px; background-color: #fff3cd; border-left: 5px solid #ffc107; font-size: 14px; text-align: left; }
+async function predict() {
+    const prediction = await model.predict(webcam.canvas);
+    for (let i = 0; i < maxPredictions; i++) {
+        const p = prediction[i];
+        if (p.probability > 0.90 && lastDetected !== p.className) {
+            lastDetected = p.className;
+            showModal(p.className);
+            updateBins(p.className);
+        }
+    }
+}
+
+function showModal(type) {
+    const data = disposalData[type];
+    if (!data) return;
+    
+    document.getElementById("wasteTitle").innerText = type + " Waste Detected!";
+    const list = document.getElementById("disposalList");
+    list.innerHTML = "";
+    data.rules.forEach(r => {
+        let li = document.createElement("li");
+        li.innerText = r;
+        list.appendChild(li);
+    });
+    document.getElementById("specialNote").innerText = data.note;
+    document.getElementById("disposalModal").style.display = "block";
+}
+
+function updateBins(type) {
+    const mapping = {"Plastic": 1, "Organic": 2, "Paper": 3, "Metal": 4, "Glass": 5};
+    const id = mapping[type];
+    if (id) {
+        document.getElementById("fill" + id).style.width = "75%";
+        document.getElementById("bin" + id).innerText = "AI Status: Level High";
+        document.getElementById("bin" + id).style.color = "red";
+    }
+}
+
+function closeModal() {
+    document.getElementById("disposalModal").style.display = "none";
+    setTimeout(() => { lastDetected = ""; }, 4000);
+}
