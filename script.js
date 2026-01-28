@@ -4,14 +4,14 @@ let wasteLog = [];
 let lastDetected = "";
 
 const disposalData = {
-    "Plastic": ["Rinse residues", "Remove bottle caps", "Flatten to save space"],
-    "Organic": ["No plastic wraps", "Remove fruit stickers", "Ideal for composting"],
-    "Paper": ["Must be dry", "Remove plastic tape", "Flatten cardboard"],
-    "Metal": ["Clean food cans", "Recycle foil separately", "Check for sharp edges"]
+    "Plastic": ["Rinse residues", "Remove caps", "Flatten bottle"],
+    "Organic": ["No plastic bags", "Remove stickers", "Compost if possible"],
+    "Paper": ["Keep dry", "Remove tape", "Flatten cardboard boxes"],
+    "Metal": ["Clean food cans", "Recycle clean foil", "Check for sharp edges"]
 };
 
 async function init() {
-    document.getElementById("webcam-container").innerHTML = "<p style='color:white; padding-top:140px;'>Loading AI Model...</p>";
+    document.getElementById("webcam-container").innerHTML = "<p style='color:white; padding-top:140px;'>AI Loading...</p>";
     model = await tmImage.load(URL + "model.json", URL + "metadata.json");
     maxPredictions = model.getTotalClasses();
 
@@ -43,16 +43,16 @@ async function predict() {
 
         if (p.probability > 0.95 && lastDetected !== p.className) {
             lastDetected = p.className;
-            
-            // Log for report
             wasteLog.push({ time: new Date().toLocaleTimeString(), type: p.className });
 
-            // Trigger Pop-up
             showDisposalGuide(p.className);
 
-            // Auto-update Bins
-            if (p.className.includes("Plastic")) fillBin(1);
-            if (p.className.includes("Organic")) fillBin(2);
+            // Auto-trigger bins based on class name
+            const name = p.className.toLowerCase();
+            if (name.includes("plastic")) fillBin(1);
+            else if (name.includes("organic")) fillBin(2);
+            else if (name.includes("paper")) fillBin(3);
+            else if (name.includes("metal")) fillBin(4);
         }
     }
 }
@@ -77,7 +77,7 @@ function showDisposalGuide(type) {
     document.getElementById("wasteTitle").innerText = type + " Disposal Guide";
     const list = document.getElementById("disposalList");
     list.innerHTML = "";
-    (disposalData[type] || ["Dispose in general waste"]).forEach(item => {
+    (disposalData[type] || ["Place in proper bin"]).forEach(item => {
         let li = document.createElement("li");
         li.innerText = item;
         list.appendChild(li);
@@ -87,11 +87,11 @@ function showDisposalGuide(type) {
 
 function closeModal() {
     document.getElementById("disposalModal").style.display = "none";
-    setTimeout(() => { lastDetected = ""; }, 5000); // Cool down
+    setTimeout(() => { lastDetected = ""; }, 5000); // Wait 5s before same item scan
 }
 
 function downloadReport() {
-    if (wasteLog.length === 0) return alert("No data yet!");
+    if (wasteLog.length === 0) return alert("No scans yet!");
     let csv = "Time,Waste Type\n" + wasteLog.map(r => `${r.time},${r.type}`).join("\n");
     const blob = new Blob([csv], { type: 'text/csv' });
     const url = window.URL.createObjectURL(blob);
