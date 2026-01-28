@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI-Based Smart Waste Management System</title>
     <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto+Mono&display=swap" rel="stylesheet">
 </head>
 <body>
 
@@ -31,6 +32,7 @@
 
     <div style="text-align: center; margin: 20px;">
         <button class="btn-report" onclick="downloadReport()">📊 Download Waste Log Report</button>
+        <button class="btn-report" onclick="simulateFullBin()" style="background-color: #e74c3c; margin-left: 10px;">🚨 IoT Alert Simulation</button>
     </div>
 
     <div class="bin-container">
@@ -39,25 +41,21 @@
             <div class="progress"><div class="progress-fill" id="fill1"></div></div>
             <p class="ai-status" id="bin1">AI Status: Empty</p>
         </div>
-
         <div class="bin ai-bin">
             <h3>Organic Bin</h3>
             <div class="progress"><div class="progress-fill" id="fill2"></div></div>
             <p class="ai-status" id="bin2">AI Status: Empty</p>
         </div>
-
         <div class="bin ai-bin">
             <h3>Paper Bin</h3>
             <div class="progress"><div class="progress-fill" id="fill3"></div></div>
             <p class="ai-status" id="bin3">AI Status: Empty</p>
         </div>
-
         <div class="bin ai-bin">
             <h3>Metal Bin</h3>
             <div class="progress"><div class="progress-fill" id="fill4"></div></div>
             <p class="ai-status" id="bin4">AI Status: Empty</p>
         </div>
-
         <div class="bin ai-bin">
             <h3>Glass Bin</h3>
             <div class="progress"><div class="progress-fill" id="fill5"></div></div>
@@ -66,22 +64,13 @@
     </div>
 </section>
 
-<div id="disposalModal" class="modal">
-    <div class="modal-content">
-        <span class="close-btn" onclick="closeModal()">&times;</span>
-        <h2 id="wasteTitle"></h2>
-        <ul id="disposalList"></ul>
-        <div id="specialNote"></div>
-        <button class="btn-main" onclick="closeModal()" style="margin-top:20px;">Got it!</button>
-    </div>
-</div>
-
 <footer>
     <p>© 2026 AI-Based Smart Waste Management System</p>
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest/dist/tf.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@latest/dist/teachablemachine-image.min.js"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
 <script src="script.js"></script>
 
 </body>
