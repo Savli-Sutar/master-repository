@@ -43,6 +43,15 @@
 <section id="dashboard">
     <h2 class="ai-title">🤖 AI Smart Bin Dashboard</h2>
 
+    <div style="text-align: center; margin-bottom: 30px;">
+    <button onclick="init()" style="margin-bottom: 10px; padding: 15px 30px; font-size: 18px;">Start AI Camera</button>
+    <div id="webcam-container" style="margin: 0 auto; width: 300px; height: 300px; border: 5px solid #2e8b57; border-radius: 15px; background: #000;"></div>
+    <div id="label-container" style="margin-top: 10px; font-weight: bold;"></div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest/dist/tf.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@latest/dist/teachablemachine-image.min.js"></script>
+
     <div class="bin ai-bin">
         <h3>Bin 1</h3>
         <div class="progress">
@@ -76,3 +85,4 @@
 <script src="script.js"></script>
 </body>
 </html>
+
