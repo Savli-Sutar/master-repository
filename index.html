@@ -20,11 +20,6 @@
     <a href="#contact">Contact</a>
 </nav>
 
-<section id="about">
-    <h2>About the Project</h2>
-    <p>The AI-Based Smart Waste Management System uses Artificial Intelligence and IoT to monitor waste levels and automate segregation.</p>
-</section>
-
 <section id="dashboard">
     <h2 class="ai-title">🤖 AI Smart Bin Dashboard</h2>
 
@@ -41,20 +36,30 @@
     <div class="bin-container">
         <div class="bin ai-bin">
             <h3>Plastic Bin</h3>
-            <div class="progress">
-                <div class="progress-fill" id="fill1"></div>
-            </div>
+            <div class="progress"><div class="progress-fill" id="fill1"></div></div>
             <p class="ai-status" id="bin1">AI Status: Empty</p>
             <button onclick="fillBin(1)">Add Waste</button>
         </div>
 
         <div class="bin ai-bin">
             <h3>Organic Bin</h3>
-            <div class="progress">
-                <div class="progress-fill" id="fill2"></div>
-            </div>
+            <div class="progress"><div class="progress-fill" id="fill2"></div></div>
             <p class="ai-status" id="bin2">AI Status: Empty</p>
             <button onclick="fillBin(2)">Add Waste</button>
+        </div>
+
+        <div class="bin ai-bin">
+            <h3>Paper Bin</h3>
+            <div class="progress"><div class="progress-fill" id="fill3"></div></div>
+            <p class="ai-status" id="bin3">AI Status: Empty</p>
+            <button onclick="fillBin(3)">Add Waste</button>
+        </div>
+
+        <div class="bin ai-bin">
+            <h3>Metal Bin</h3>
+            <div class="progress"><div class="progress-fill" id="fill4"></div></div>
+            <p class="ai-status" id="bin4">AI Status: Empty</p>
+            <button onclick="fillBin(4)">Add Waste</button>
         </div>
     </div>
 </section>
@@ -67,12 +72,6 @@
         <button class="btn-main" onclick="closeModal()">Got it!</button>
     </div>
 </div>
-
-<section id="contact">
-    <h2>Contact</h2>
-    <p>College Project by: <b>Your Name</b></p>
-    <p>Department: Computer / IT / ECE</p>
-</section>
 
 <footer>
     <p>© 2026 AI-Based Smart Waste Management System</p>
