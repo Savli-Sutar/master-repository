@@ -1,39 +1,29 @@
-// AI Model Configuration
 const URL = "https://teachablemachine.withgoogle.com/models/qzbWj1b7y/";
 let model, webcam, labelContainer, maxPredictions;
-let wasteLog = []; 
-let lastDetected = ""; 
+let wasteLog = [];
+let lastDetected = "";
 
-// Disposal Instructions Data
 const disposalData = {
-    "Plastic": ["Rinse the container", "Remove the cap", "Flatten the bottle"],
-    "Organic": ["No plastic bags", "Remove stickers", "Drain excess liquids"],
-    "Paper": ["Keep it dry", "Remove tape/staples", "Flatten boxes"],
-    "Metal": ["Rinse food residue", "Place lids inside cans", "Recycle only clean metal"]
+    "Plastic": ["Rinse residues", "Remove bottle caps", "Flatten to save space"],
+    "Organic": ["No plastic wraps", "Remove fruit stickers", "Ideal for composting"],
+    "Paper": ["Must be dry", "Remove plastic tape", "Flatten cardboard"],
+    "Metal": ["Clean food cans", "Recycle foil separately", "Check for sharp edges"]
 };
 
-// 1. Initialize AI Model and Webcam
 async function init() {
-    const modelURL = URL + "model.json";
-    const metadataURL = URL + "metadata.json";
-
-    // Load the model
-    model = await tmImage.load(modelURL, metadataURL);
+    document.getElementById("webcam-container").innerHTML = "<p style='color:white; padding-top:140px;'>Loading AI Model...</p>";
+    model = await tmImage.load(URL + "model.json", URL + "metadata.json");
     maxPredictions = model.getTotalClasses();
 
-    // Setup Webcam
-    const flip = true; 
-    webcam = new tmImage.Webcam(300, 300, flip); 
-    await webcam.setup(); 
+    webcam = new tmImage.Webcam(300, 300, true);
+    await webcam.setup();
     await webcam.play();
     window.requestAnimationFrame(loop);
 
-    // Add webcam to the UI
-    document.getElementById("webcam-container").innerHTML = ""; // Clear loading text
+    document.getElementById("webcam-container").innerHTML = "";
     document.getElementById("webcam-container").appendChild(webcam.canvas);
-    
     labelContainer = document.getElementById("label-container");
-    labelContainer.innerHTML = ""; // Clear old labels
+    labelContainer.innerHTML = "";
     for (let i = 0; i < maxPredictions; i++) {
         labelContainer.appendChild(document.createElement("div"));
     }
@@ -45,97 +35,68 @@ async function loop() {
     window.requestAnimationFrame(loop);
 }
 
-// 2. AI Prediction Logic
 async function predict() {
     const prediction = await model.predict(webcam.canvas);
-    
     for (let i = 0; i < maxPredictions; i++) {
         const p = prediction[i];
-        const className = p.className;
-        const probability = (p.probability * 100).toFixed(0);
+        labelContainer.childNodes[i].innerHTML = `<b>${p.className}:</b> ${(p.probability * 100).toFixed(0)}%`;
 
-        labelContainer.childNodes[i].innerHTML = `${className}: ${probability}%`;
-
-        // Logic: Trigger if confidence is > 90%
-        if (p.probability > 0.90 && lastDetected !== className) {
-            lastDetected = className;
+        if (p.probability > 0.95 && lastDetected !== p.className) {
+            lastDetected = p.className;
             
-            // Log Data for Report
-            wasteLog.push({
-                Time: new Date().toLocaleTimeString(),
-                Type: className,
-                Confidence: probability + "%"
-            });
+            // Log for report
+            wasteLog.push({ time: new Date().toLocaleTimeString(), type: p.className });
 
-            // Show UI Effects
-            showDisposalGuide(className);
-            
-            if (className.includes("Plastic")) fillBin(1);
-            else if (className.includes("Organic")) fillBin(2);
+            // Trigger Pop-up
+            showDisposalGuide(p.className);
+
+            // Auto-update Bins
+            if (p.className.includes("Plastic")) fillBin(1);
+            if (p.className.includes("Organic")) fillBin(2);
         }
     }
 }
 
-// 3. Bin Filling Logic
 function fillBin(binNo) {
-    var statusText = document.getElementById("bin" + binNo);
-    var progressBar = document.getElementById("fill" + binNo);
+    const status = document.getElementById("bin" + binNo);
+    const fill = document.getElementById("fill" + binNo);
 
-    if (statusText.innerText.includes("Empty")) {
-        statusText.innerText = "AI Status: Half Filled";
-        statusText.style.color = "orange";
-        progressBar.style.width = "50%";
-    }
-    else {
-        statusText.innerText = "AI Status: Full";
-        statusText.style.color = "red";
-        progressBar.style.width = "100%";
+    if (status.innerText.includes("Empty")) {
+        status.innerText = "AI Status: Half Filled";
+        status.style.color = "orange";
+        fill.style.width = "50%";
+    } else {
+        status.innerText = "AI Status: Full";
+        status.style.color = "red";
+        fill.style.width = "100%";
     }
 }
 
-// 4. Modal Pop-up Logic
 function showDisposalGuide(type) {
     const modal = document.getElementById("disposalModal");
-    const title = document.getElementById("wasteTitle");
+    document.getElementById("wasteTitle").innerText = type + " Disposal Guide";
     const list = document.getElementById("disposalList");
-
-    title.innerText = type + " Disposal Instructions";
     list.innerHTML = "";
-
-    const rules = disposalData[type] || ["Dispose in appropriate bin"];
-    rules.forEach(rule => {
+    (disposalData[type] || ["Dispose in general waste"]).forEach(item => {
         let li = document.createElement("li");
-        li.innerText = rule;
+        li.innerText = item;
         list.appendChild(li);
     });
-
     modal.style.display = "block";
 }
 
 function closeModal() {
     document.getElementById("disposalModal").style.display = "none";
-    // Short cooldown before detecting the same item again
-    setTimeout(() => { lastDetected = ""; }, 3000);
+    setTimeout(() => { lastDetected = ""; }, 5000); // Cool down
 }
 
-// 5. Download CSV Report
 function downloadReport() {
-    if (wasteLog.length === 0) {
-        alert("No waste detected yet!");
-        return;
-    }
-    let csv = "Time,Waste Type,Confidence\n";
-    wasteLog.forEach(row => {
-        csv += `${row.Time},${row.Type},${row.Confidence}\n`;
-    });
-
+    if (wasteLog.length === 0) return alert("No data yet!");
+    let csv = "Time,Waste Type\n" + wasteLog.map(r => `${r.time},${r.type}`).join("\n");
     const blob = new Blob([csv], { type: 'text/csv' });
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement('a');
-    a.setAttribute('hidden', '');
-    a.setAttribute('href', url);
-    a.setAttribute('download', 'Waste_Report.csv');
-    document.body.appendChild(a);
+    a.href = url;
+    a.download = 'Waste_Report.csv';
     a.click();
-    document.body.removeChild(a);
 }
