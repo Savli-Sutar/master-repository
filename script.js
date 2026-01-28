@@ -1,17 +1,33 @@
-const URL = "https://teachablemachine.withgoogle.com/models/CPn8HY5wC/";
+const URL = "PASTE_YOUR_NEW_URL_HERE/"; 
 let model, webcam, labelContainer, maxPredictions;
 let wasteLog = [];
 let lastDetected = "";
 
 const disposalData = {
-    "Plastic": ["Rinse residues", "Remove caps", "Flatten bottle"],
-    "Organic": ["No plastic bags", "Remove stickers", "Compost if possible"],
-    "Paper": ["Keep dry", "Remove tape", "Flatten cardboard boxes"],
-    "Metal": ["Clean food cans", "Recycle clean foil", "Check for sharp edges"]
+    "Plastic": {
+        rules: ["Rinse residues", "Remove caps", "Flatten bottle"],
+        note: "⚠️ If plastic is heavily contaminated with oil, it may not be recyclable."
+    },
+    "Organic": {
+        rules: ["No plastic wraps", "Remove stickers", "Compost if possible"],
+        note: "🧁 Special Case: Greasy cupcake liners and pizza boxes belong here!"
+    },
+    "Paper": {
+        rules: ["Keep dry", "Remove tape", "Flatten cardboard"],
+        note: "⚠️ Paper must be clean. If it's greasy or wet, move it to Organic."
+    },
+    "Metal": {
+        rules: ["Clean food cans", "Recycle clean foil", "Check for sharp edges"],
+        note: "⚠️ Ensure cans are empty to avoid attracting pests."
+    },
+    "Glass": {
+        rules: ["Rinse jars and bottles", "Remove metal lids", "Keep glass intact"],
+        note: "⚠️ Note: Mirrors and light bulbs are NOT recyclable glass."
+    }
 };
 
 async function init() {
-    document.getElementById("webcam-container").innerHTML = "<p style='color:white; padding-top:140px;'>AI Loading...</p>";
+    document.getElementById("webcam-container").innerHTML = "<p style='color:white; padding-top:140px;'>Loading Smarter AI...</p>";
     model = await tmImage.load(URL + "model.json", URL + "metadata.json");
     maxPredictions = model.getTotalClasses();
 
@@ -47,12 +63,12 @@ async function predict() {
 
             showDisposalGuide(p.className);
 
-            // Auto-trigger bins based on class name
-            const name = p.className.toLowerCase();
-            if (name.includes("plastic")) fillBin(1);
-            else if (name.includes("organic")) fillBin(2);
-            else if (name.includes("paper")) fillBin(3);
-            else if (name.includes("metal")) fillBin(4);
+            const name = p.className;
+            if (name === "Plastic") fillBin(1);
+            else if (name === "Organic") fillBin(2);
+            else if (name === "Paper") fillBin(3);
+            else if (name === "Metal") fillBin(4);
+            else if (name === "Glass") fillBin(5);
         }
     }
 }
@@ -60,7 +76,6 @@ async function predict() {
 function fillBin(binNo) {
     const status = document.getElementById("bin" + binNo);
     const fill = document.getElementById("fill" + binNo);
-
     if (status.innerText.includes("Empty")) {
         status.innerText = "AI Status: Half Filled";
         status.style.color = "orange";
@@ -74,20 +89,32 @@ function fillBin(binNo) {
 
 function showDisposalGuide(type) {
     const modal = document.getElementById("disposalModal");
-    document.getElementById("wasteTitle").innerText = type + " Disposal Guide";
     const list = document.getElementById("disposalList");
+    const noteBox = document.getElementById("specialNote");
+    
+    document.getElementById("wasteTitle").innerText = type + " Disposal Guide";
     list.innerHTML = "";
-    (disposalData[type] || ["Place in proper bin"]).forEach(item => {
-        let li = document.createElement("li");
-        li.innerText = item;
-        list.appendChild(li);
-    });
+    
+    const data = disposalData[type];
+    if (data) {
+        data.rules.forEach(item => {
+            let li = document.createElement("li");
+            li.innerText = item;
+            list.appendChild(li);
+        });
+        if (data.note) {
+            noteBox.innerText = data.note;
+            noteBox.style.display = "block";
+        } else {
+            noteBox.style.display = "none";
+        }
+    }
     modal.style.display = "block";
 }
 
 function closeModal() {
     document.getElementById("disposalModal").style.display = "none";
-    setTimeout(() => { lastDetected = ""; }, 5000); // Wait 5s before same item scan
+    setTimeout(() => { lastDetected = ""; }, 5000);
 }
 
 function downloadReport() {
@@ -100,4 +127,3 @@ function downloadReport() {
     a.download = 'Waste_Report.csv';
     a.click();
 }
-
