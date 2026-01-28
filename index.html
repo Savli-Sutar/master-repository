@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI-Based Smart Waste Management System</title>
     <link rel="stylesheet" href="style.css">
 </head>
@@ -21,70 +22,51 @@
 
 <section id="about">
     <h2>About the Project</h2>
-    <p>
-        The AI-Based Smart Waste Management System uses Artificial Intelligence
-        and Internet of Things (IoT) to monitor waste levels, segregate waste,
-        and optimize garbage collection. This helps reduce pollution and
-        improves recycling efficiency.
-    </p>
-</section>
-
-<section id="features">
-    <h2>Key Features</h2>
-    <ul>
-        <li>Smart Dustbins with Sensors</li>
-        <li>AI-Based Waste Segregation</li>
-        <li>Real-Time Waste Monitoring</li>
-        <li>Optimized Garbage Collection Routes</li>
-        <li>Eco-Friendly & Cost Effective</li>
-    </ul>
+    <p>The AI-Based Smart Waste Management System uses Artificial Intelligence and IoT to monitor waste levels and automate segregation.</p>
 </section>
 
 <section id="dashboard">
     <h2 class="ai-title">🤖 AI Smart Bin Dashboard</h2>
 
-    <div style="text-align: center; margin-bottom: 30px;">
-    <button onclick="init()" style="margin-bottom: 10px; padding: 15px 30px; font-size: 18px;">Start AI Camera</button>
-    <div id="webcam-container" style="margin: 0 auto; width: 300px; height: 300px; border: 5px solid #2e8b57; border-radius: 15px; background: #000;"></div>
-    <div id="label-container" style="margin-top: 10px; font-weight: bold;"></div>
-</div>
+    <div class="ai-camera-box">
+        <button class="btn-main" onclick="init()">Start AI Camera</button>
+        <div id="webcam-container"></div>
+        <div id="label-container"></div>
+    </div>
 
-<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest/dist/tf.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@latest/dist/teachablemachine-image.min.js"></script>
-    <div style="text-align: center; margin-top: 30px;">
-    <button onclick="downloadReport()" style="background-color: #1e6f43; padding: 12px 25px;">
-        📊 Download Waste Log Report
-    </button>
-</div>
+    <div style="text-align: center; margin: 20px;">
+        <button class="btn-report" onclick="downloadReport()">📊 Download Waste Log Report</button>
+    </div>
+
+    <div class="bin-container">
+        <div class="bin ai-bin">
+            <h3>Plastic Bin</h3>
+            <div class="progress">
+                <div class="progress-fill" id="fill1"></div>
+            </div>
+            <p class="ai-status" id="bin1">AI Status: Empty</p>
+            <button onclick="fillBin(1)">Add Waste</button>
+        </div>
+
+        <div class="bin ai-bin">
+            <h3>Organic Bin</h3>
+            <div class="progress">
+                <div class="progress-fill" id="fill2"></div>
+            </div>
+            <p class="ai-status" id="bin2">AI Status: Empty</p>
+            <button onclick="fillBin(2)">Add Waste</button>
+        </div>
+    </div>
+</section>
 
 <div id="disposalModal" class="modal">
     <div class="modal-content">
         <span class="close-btn" onclick="closeModal()">&times;</span>
         <h2 id="wasteTitle"></h2>
         <ul id="disposalList"></ul>
-        <button onclick="closeModal()">Got it!</button>
+        <button class="btn-main" onclick="closeModal()">Got it!</button>
     </div>
 </div>
-
-    <div class="bin ai-bin">
-        <h3>Bin 1</h3>
-        <div class="progress">
-            <div class="progress-fill" id="fill1"></div>
-        </div>
-        <p class="ai-status" id="bin1">AI Status: Empty</p>
-        <button onclick="fillBin(1)">Add Waste</button>
-    </div>
-
-    <div class="bin ai-bin">
-        <h3>Bin 2</h3>
-        <div class="progress">
-            <div class="progress-fill" id="fill2"></div>
-        </div>
-        <p class="ai-status" id="bin2">AI Status: Empty</p>
-        <button onclick="fillBin(2)">Add Waste</button>
-    </div>
-</section>
-
 
 <section id="contact">
     <h2>Contact</h2>
@@ -96,8 +78,9 @@
     <p>© 2026 AI-Based Smart Waste Management System</p>
 </footer>
 
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest/dist/tf.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@latest/dist/teachablemachine-image.min.js"></script>
 <script src="script.js"></script>
+
 </body>
 </html>
-
-
