@@ -5,29 +5,29 @@ let lastDetected = "";
 
 const disposalData = {
     "Plastic": {
-        rules: ["• Rinse containers.", "• Remove caps.", "• Squash bottles."],
-        note: "⚠️ Greasy plastic goes to General Waste."
+        rules: ["• Rinse containers.", "• Remove caps.", "• Squash bottles.", "• Check for #1 or #2 symbols."],
+        note: "⚠️ Greasy plastic (oil bottles) go to General Waste."
     },
     "Organic": {
-        rules: ["• No plastic bags.", "• Drain liquids.", "• Remove stickers."],
-        note: "🧁 Special Case: Cupcake liners belong here!"
+        rules: ["• No plastic bags.", "• Drain liquids.", "• Remove stickers.", "• Composable liners only."],
+        note: "🧁 Special Case: Greasy cupcake liners belong here!"
     },
     "Paper": {
-        rules: ["• Keep it dry.", "• Flatten boxes.", "• Remove tape."],
+        rules: ["• Keep it dry.", "• Flatten boxes.", "• Remove tape.", "• No food stains."],
         note: "⚠️ Greasy pizza boxes belong in Organic."
     },
     "Metal": {
-        rules: ["• Rinse cans.", "• Push lids inside.", "• No electronics."],
-        note: "⚠️ Batteries are e-waste!"
+        rules: ["• Rinse cans.", "• Push lids inside.", "• No electronics.", "• Scrunch clean foil."],
+        note: "⚠️ Batteries are e-waste! Do not put them here."
     },
     "Glass": {
-        rules: ["• Rinse jars.", "• Remove metal lids.", "• Do not break."],
-        note: "⚠️ Light bulbs are NOT recyclable glass."
+        rules: ["• Rinse jars.", "• Remove metal lids.", "• Do not break.", "• Separate by color."],
+        note: "⚠️ Light bulbs and mirrors are NOT recyclable glass."
     }
 };
 
 async function init() {
-    document.getElementById("webcam-container").innerHTML = "<p style='color:white; padding-top:140px;'>Loading AI...</p>";
+    document.getElementById("webcam-container").innerHTML = "<p style='color:white; padding-top:140px;'>Loading AI Model...</p>";
     model = await tmImage.load(URL + "model.json", URL + "metadata.json");
     maxPredictions = model.getTotalClasses();
 
@@ -49,8 +49,19 @@ async function loop() {
 
 async function predict() {
     const prediction = await model.predict(webcam.canvas);
+    
+    // Refresh the probability box
+    labelContainer.innerHTML = "";
     for (let i = 0; i < maxPredictions; i++) {
         const p = prediction[i];
+        const percent = (p.probability * 100).toFixed(0);
+        
+        const row = document.createElement("div");
+        row.className = "prob-row";
+        row.innerHTML = `<span>${p.className}</span> <span>${percent}%</span>`;
+        labelContainer.appendChild(row);
+
+        // Logic to trigger actions
         if (p.probability > 0.92 && lastDetected !== p.className) {
             lastDetected = p.className;
             showModal(p.className);
