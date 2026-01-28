@@ -1,129 +1,79 @@
-const URL = "PASTE_YOUR_NEW_URL_HERE/"; 
+// The link to your model provided by Teachable Machine
+const URL = "https://teachablemachine.withgoogle.com/models/CPn8HY5wC/";
+
 let model, webcam, labelContainer, maxPredictions;
-let wasteLog = [];
-let lastDetected = "";
 
-const disposalData = {
-    "Plastic": {
-        rules: ["Rinse residues", "Remove caps", "Flatten bottle"],
-        note: "⚠️ If plastic is heavily contaminated with oil, it may not be recyclable."
-    },
-    "Organic": {
-        rules: ["No plastic wraps", "Remove stickers", "Compost if possible"],
-        note: "🧁 Special Case: Greasy cupcake liners and pizza boxes belong here!"
-    },
-    "Paper": {
-        rules: ["Keep dry", "Remove tape", "Flatten cardboard"],
-        note: "⚠️ Paper must be clean. If it's greasy or wet, move it to Organic."
-    },
-    "Metal": {
-        rules: ["Clean food cans", "Recycle clean foil", "Check for sharp edges"],
-        note: "⚠️ Ensure cans are empty to avoid attracting pests."
-    },
-    "Glass": {
-        rules: ["Rinse jars and bottles", "Remove metal lids", "Keep glass intact"],
-        note: "⚠️ Note: Mirrors and light bulbs are NOT recyclable glass."
-    }
-};
-
+// Load the image model and setup the webcam
 async function init() {
-    document.getElementById("webcam-container").innerHTML = "<p style='color:white; padding-top:140px;'>Loading Smarter AI...</p>";
-    model = await tmImage.load(URL + "model.json", URL + "metadata.json");
-    maxPredictions = model.getTotalClasses();
+    const modelURL = URL + "model.json";
+    const metadataURL = URL + "metadata.json";
 
-    webcam = new tmImage.Webcam(300, 300, true);
-    await webcam.setup();
-    await webcam.play();
-    window.requestAnimationFrame(loop);
+    try {
+        // Load the model and metadata
+        model = await tmImage.load(modelURL, metadataURL);
+        maxPredictions = model.getTotalClasses();
 
-    document.getElementById("webcam-container").innerHTML = "";
-    document.getElementById("webcam-container").appendChild(webcam.canvas);
-    labelContainer = document.getElementById("label-container");
-    labelContainer.innerHTML = "";
-    for (let i = 0; i < maxPredictions; i++) {
-        labelContainer.appendChild(document.createElement("div"));
+        // Convenience function to setup a webcam
+        const flip = true; // whether to flip the webcam
+        webcam = new tmImage.Webcam(350, 350, flip); // width, height, flip
+        
+        await webcam.setup(); // request access to the webcam
+        await webcam.play();
+        window.requestAnimationFrame(loop);
+
+        // Append elements to the DOM
+        document.getElementById("webcam-container").innerHTML = ""; // Clear "Loading" text
+        document.getElementById("webcam-container").appendChild(webcam.canvas);
+        
+        labelContainer = document.getElementById("label-container");
+        labelContainer.innerHTML = ""; // Clear old labels
+        for (let i = 0; i < maxPredictions; i++) {
+            labelContainer.appendChild(document.createElement("div"));
+        }
+    } catch (e) {
+        console.error(e);
+        alert("Camera failed! Make sure you are using HTTPS and have granted permissions.");
     }
 }
 
 async function loop() {
-    webcam.update();
+    webcam.update(); // update the webcam frame
     await predict();
     window.requestAnimationFrame(loop);
 }
 
+// Run the webcam image through the image model
 async function predict() {
     const prediction = await model.predict(webcam.canvas);
+    
     for (let i = 0; i < maxPredictions; i++) {
-        const p = prediction[i];
-        labelContainer.childNodes[i].innerHTML = `<b>${p.className}:</b> ${(p.probability * 100).toFixed(0)}%`;
+        const className = prediction[i].className;
+        const probability = prediction[i].probability.toFixed(2);
+        
+        labelContainer.childNodes[i].innerHTML = `${className}: ${Math.round(probability * 100)}%`;
 
-        if (p.probability > 0.95 && lastDetected !== p.className) {
-            lastDetected = p.className;
-            wasteLog.push({ time: new Date().toLocaleTimeString(), type: p.className });
-
-            showDisposalGuide(p.className);
-
-            const name = p.className;
-            if (name === "Plastic") fillBin(1);
-            else if (name === "Organic") fillBin(2);
-            else if (name === "Paper") fillBin(3);
-            else if (name === "Metal") fillBin(4);
-            else if (name === "Glass") fillBin(5);
+        // Update Bin Status if confidence is high (over 80%)
+        if (probability > 0.80) {
+            updateBinUI(className);
         }
     }
 }
 
-function fillBin(binNo) {
-    const status = document.getElementById("bin" + binNo);
-    const fill = document.getElementById("fill" + binNo);
-    if (status.innerText.includes("Empty")) {
-        status.innerText = "AI Status: Half Filled";
-        status.style.color = "orange";
-        fill.style.width = "50%";
-    } else {
-        status.innerText = "AI Status: Full";
-        status.style.color = "red";
-        fill.style.width = "100%";
+function updateBinUI(wasteType) {
+    // This part connects your AI labels to your HTML Bin IDs
+    // Adjust 'Plastic', 'Organic', etc., to match your EXACT labels in Teachable Machine
+    const bins = {
+        "Plastic": { id: "bin1", fill: "fill1" },
+        "Organic": { id: "bin2", fill: "fill2" },
+        "Paper": { id: "bin3", fill: "fill3" },
+        "Metal": { id: "bin4", fill: "fill4" },
+        "Glass": { id: "bin5", fill: "fill5" }
+    };
+
+    if (bins[wasteType]) {
+        const binData = bins[wasteType];
+        document.getElementById(binData.id).innerText = `AI Status: ${wasteType} Detected!`;
+        document.getElementById(binData.fill).style.width = "100%";
+        document.getElementById(binData.fill).style.backgroundColor = "#4caf50";
     }
-}
-
-function showDisposalGuide(type) {
-    const modal = document.getElementById("disposalModal");
-    const list = document.getElementById("disposalList");
-    const noteBox = document.getElementById("specialNote");
-    
-    document.getElementById("wasteTitle").innerText = type + " Disposal Guide";
-    list.innerHTML = "";
-    
-    const data = disposalData[type];
-    if (data) {
-        data.rules.forEach(item => {
-            let li = document.createElement("li");
-            li.innerText = item;
-            list.appendChild(li);
-        });
-        if (data.note) {
-            noteBox.innerText = data.note;
-            noteBox.style.display = "block";
-        } else {
-            noteBox.style.display = "none";
-        }
-    }
-    modal.style.display = "block";
-}
-
-function closeModal() {
-    document.getElementById("disposalModal").style.display = "none";
-    setTimeout(() => { lastDetected = ""; }, 5000);
-}
-
-function downloadReport() {
-    if (wasteLog.length === 0) return alert("No scans yet!");
-    let csv = "Time,Waste Type\n" + wasteLog.map(r => `${r.time},${r.type}`).join("\n");
-    const blob = new Blob([csv], { type: 'text/csv' });
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'Waste_Report.csv';
-    a.click();
 }
