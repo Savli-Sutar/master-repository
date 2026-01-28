@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Smart Waste Bin</title>
+    <title>AI Smart Waste Management</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -23,7 +23,10 @@
     <div class="ai-camera-box">
         <button class="btn-main" onclick="init()">Start AI Camera</button>
         <div id="webcam-container"></div>
-        <div id="label-container" style="margin-top: 15px; font-weight: bold;"></div>
+        
+        <div id="label-container" class="probability-box">
+            <p style="color: #666;">AI live analysis will appear here...</p>
+        </div>
     </div>
 
     <div class="bin-container">
