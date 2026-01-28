@@ -51,6 +51,20 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest/dist/tf.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@latest/dist/teachablemachine-image.min.js"></script>
+    <div style="text-align: center; margin-top: 30px;">
+    <button onclick="downloadReport()" style="background-color: #1e6f43; padding: 12px 25px;">
+        📊 Download Waste Log Report
+    </button>
+</div>
+
+<div id="disposalModal" class="modal">
+    <div class="modal-content">
+        <span class="close-btn" onclick="closeModal()">&times;</span>
+        <h2 id="wasteTitle"></h2>
+        <ul id="disposalList"></ul>
+        <button onclick="closeModal()">Got it!</button>
+    </div>
+</div>
 
     <div class="bin ai-bin">
         <h3>Bin 1</h3>
@@ -85,4 +99,5 @@
 <script src="script.js"></script>
 </body>
 </html>
+
 
