@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Smart Waste Classifier</title>
+
+<style>
+body {
+    font-family: 'Segoe UI', sans-serif;
+    text-align: center;
+    background-color: #f4f9f4;
+    margin: 0;
+    padding: 20px;
+}
+
+h1 { color: #2e7d32; }
+
+#webcam-container {
+    margin: 20px auto;
+    width: 400px;
+    height: 400px;
+    border: 8px solid #2e7d32;
+    border-radius: 20px;
+    background: black;
+}
+
+#label-container {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin: 15px 0;
+}
+
+#label-container div {
+    background: white;
+    padding: 8px 15px;
+    border-radius: 20px;
+    font-weight: bold;
+}
+
+#instructions {
+    max-width: 520px;
+    margin: 20px auto;
+    background: white;
+    padding: 20px;
+    border-radius: 15px;
+    text-align: left;
+    box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+    display: none;
+}
+
+.waste-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 15px;
+    max-width: 900px;
+    margin: 40px auto;
+}
+
+.waste-card {
+    background: white;
+    padding: 15px;
+    border-radius: 15px;
+    border-bottom: 6px solid #ccc;
+    opacity: 0.6;
+    transition: 0.3s;
+}
+
+.active-card {
+    opacity: 1;
+    transform: scale(1.1);
+}
+
+.card-plastic { border-color: #3498db; }
+.card-paper { border-color: #f1c40f; }
+.card-metal { border-color: #95a5a6; }
+.card-organic { border-color: #2ecc71; }
+</style>
+</head>
+
+<body>
+
+<h1>Smart Waste Classifier</h1>
+<button onclick="init()">Start Camera</button>
+
+<div id="webcam-container"></div>
+<div id="label-container"></div>
+
+<div id="instructions">
+    <h3 id="instruction-title"></h3>
+    <ul id="instruction-list"></ul>
+</div>
+
+<div class="waste-grid">
+    <div id="card-plastic" class="waste-card card-plastic">♻️ Plastic</div>
+    <div id="card-paper" class="waste-card card-paper">📄 Paper</div>
+    <div id="card-metal" class="waste-card card-metal">🥫 Metal</div>
+    <div id="card-organic" class="waste-card card-organic">🍎 Organic</div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest/dist/tf.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@latest/dist/teachablemachine-image.min.js"></script>
+
+<script>
+const URL = "https://teachablemachine.withgoogle.com/models/qzbWj1b7y/";
+let model, webcam, labelContainer;
+
+const disposalRules = {
+    plastic: [
+        "Rinse plastic items thoroughly before disposal.",
+        "Ensure bottle caps are securely closed.",
+        "Do not include plastic bags or wrappers."
+    ],
+    paper: [
+        "Keep paper clean and completely dry.",
+        "Flatten cardboard boxes before disposal.",
+        "Remove plastic covers or tapes."
+    ],
+    metal: [
+        "Rinse metal containers to remove residue.",
+        "Recycle only aluminum and steel items.",
+        "Place loose lids inside cans."
+    ],
+    organic: [
+        "Remove stickers from fruits and vegetables.",
+        "Avoid mixing organic waste with plastics.",
+        "Use organic waste for composting if possible."
+    ]
+};
+
+function showInstructions(type) {
+    const box = document.getElementById("instructions");
+    const title = document.getElementById("instruction-title");
+    const list = document.getElementById("instruction-list");
+
+    title.innerText = type.toUpperCase() + " DISPOSAL INSTRUCTIONS";
+    list.innerHTML = "";
+
+    disposalRules[type].forEach(rule => {
+        const li = document.createElement("li");
+        li.innerText = rule;
+        list.appendChild(li);
+    });
+
+    box.style.display = "block";
+}
+
+async function init() {
+    model = await tmImage.load(URL + "model.json", URL + "metadata.json");
+
+    webcam = new tmImage.Webcam(400, 400, true);
+    await webcam.setup();
+    await webcam.play();
+
+    document.getElementById("webcam-container").appendChild(webcam.canvas);
+
+    labelContainer = document.getElementById("label-container");
+    labelContainer.innerHTML = "";
+
+    for (let i = 0; i < model.getTotalClasses(); i++) {
+        labelContainer.appendChild(document.createElement("div"));
+    }
+
+    window.requestAnimationFrame(loop);
+}
+
+async function loop() {
+    webcam.update();
+    await predict();
+    requestAnimationFrame(loop);
+}
+
+async function predict() {
+    const predictions = await model.predict(webcam.canvas);
+
+    // 1️⃣ Find BEST prediction
+    let best = predictions.reduce((a, b) =>
+        a.probability > b.probability ? a : b
+    );
+
+    // Update labels
+    predictions.forEach((p, i) => {
+        labelContainer.childNodes[i].innerText =
+            p.className + ": " + (p.probability * 100).toFixed(0) + "%";
+    });
+
+    // Reset UI
+    document.querySelectorAll(".waste-card")
+        .forEach(c => c.classList.remove("active-card"));
+
+    // 2️⃣ Only act on best class
+    if (best.probability > 0.7) {
+        const name = best.className.toLowerCase();
+
+        if (name.includes("plastic")) {
+            document.getElementById("card-plastic").classList.add("active-card");
+            showInstructions("plastic");
+        }
+        else if (name.includes("paper")) {
+            document.getElementById("card-paper").classList.add("active-card");
+            showInstructions("paper");
+        }
+        else if (name.includes("metal")) {
+            document.getElementById("card-metal").classList.add("active-card");
+            showInstructions("metal");
+        }
+        else if (name.includes("organic")) {
+            document.getElementById("card-organic").classList.add("active-card");
+            showInstructions("organic");
+        }
+    }
+}
+</script>
+
+</body>
+</html>
