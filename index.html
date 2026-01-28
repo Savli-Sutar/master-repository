@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Smart Waste Management</title>
+    <title>AI Smart Waste Bin</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -16,7 +16,6 @@
 <nav>
     <a href="#about">About</a>
     <a href="#dashboard">Dashboard</a>
-    <a href="#contact">Contact</a>
 </nav>
 
 <section id="dashboard">
@@ -28,56 +27,24 @@
         <div id="label-container"></div>
     </div>
 
-    <div style="text-align: center; margin: 20px;">
-        <button class="btn-report" onclick="downloadReport()">📊 Download Waste Log Report</button>
-    </div>
-
     <div class="bin-container">
-        <div class="bin">
-            <h3>Plastic Bin</h3>
-            <div class="progress"><div class="progress-fill" id="fill1"></div></div>
-            <p class="ai-status" id="bin1">AI Status: Empty</p>
-        </div>
-
-        <div class="bin">
-            <h3>Organic Bin</h3>
-            <div class="progress"><div class="progress-fill" id="fill2"></div></div>
-            <p class="ai-status" id="bin2">AI Status: Empty</p>
-        </div>
-
-        <div class="bin">
-            <h3>Paper Bin</h3>
-            <div class="progress"><div class="progress-fill" id="fill3"></div></div>
-            <p class="ai-status" id="bin3">AI Status: Empty</p>
-        </div>
-
-        <div class="bin">
-            <h3>Metal Bin</h3>
-            <div class="progress"><div class="progress-fill" id="fill4"></div></div>
-            <p class="ai-status" id="bin4">AI Status: Empty</p>
-        </div>
-
-        <div class="bin">
-            <h3>Glass Bin</h3>
-            <div class="progress"><div class="progress-fill" id="fill5"></div></div>
-            <p class="ai-status" id="bin5">AI Status: Empty</p>
-        </div>
+        <div class="bin"><h3>Plastic</h3><div class="progress"><div class="progress-fill" id="fill1"></div></div><p id="bin1">AI Status: Empty</p></div>
+        <div class="bin"><h3>Organic</h3><div class="progress"><div class="progress-fill" id="fill2"></div></div><p id="bin2">AI Status: Empty</p></div>
+        <div class="bin"><h3>Paper</h3><div class="progress"><div class="progress-fill" id="fill3"></div></div><p id="bin3">AI Status: Empty</p></div>
+        <div class="bin"><h3>Metal</h3><div class="progress"><div class="progress-fill" id="fill4"></div></div><p id="bin4">AI Status: Empty</p></div>
+        <div class="bin"><h3>Glass</h3><div class="progress"><div class="progress-fill" id="fill5"></div></div><p id="bin5">AI Status: Empty</p></div>
     </div>
 </section>
 
 <div id="disposalModal" class="modal">
     <div class="modal-content">
         <span class="close-btn" onclick="closeModal()">&times;</span>
-        <h2 id="wasteTitle" style="color: #2e8b57;"></h2>
+        <h2 id="wasteTitle"></h2>
         <ul id="disposalList"></ul>
         <div id="specialNote"></div>
-        <button class="btn-main" onclick="closeModal()" style="margin-top:20px;">Got it!</button>
+        <button class="btn-main" onclick="closeModal()" style="margin-top:15px;">Confirm Disposal</button>
     </div>
 </div>
-
-<footer style="text-align: center; padding: 20px; background: #2e8b57; color: white;">
-    <p>© 2026 AI-Based Smart Waste Management System</p>
-</footer>
 
 <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest/dist/tf.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@latest/dist/teachablemachine-image.min.js"></script>
