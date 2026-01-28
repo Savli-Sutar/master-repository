@@ -5,23 +5,23 @@ let lastDetected = "";
 
 const disposalData = {
     "Plastic": {
-        rules: ["• Rinse containers.", "• Remove caps.", "• Squash bottles.", "• Check for #1 or #2 symbols."],
+        rules: ["• Rinse containers.", "• Remove caps.", "• Squash bottles."],
         note: "⚠️ Greasy plastic (oil bottles) go to General Waste."
     },
     "Organic": {
-        rules: ["• No plastic bags.", "• Drain liquids.", "• Remove stickers.", "• Composable liners only."],
+        rules: ["• No plastic bags.", "• Drain liquids.", "• Remove stickers."],
         note: "🧁 Special Case: Greasy cupcake liners belong here!"
     },
     "Paper": {
-        rules: ["• Keep it dry.", "• Flatten boxes.", "• Remove tape.", "• No food stains."],
+        rules: ["• Keep it dry.", "• Flatten boxes.", "• Remove tape."],
         note: "⚠️ Greasy pizza boxes belong in Organic."
     },
     "Metal": {
-        rules: ["• Rinse cans.", "• Push lids inside.", "• No electronics.", "• Scrunch clean foil."],
+        rules: ["• Rinse cans.", "• Push lids inside.", "• No electronics."],
         note: "⚠️ Batteries are e-waste! Do not put them here."
     },
     "Glass": {
-        rules: ["• Rinse jars.", "• Remove metal lids.", "• Do not break.", "• Separate by color."],
+        rules: ["• Rinse jars.", "• Remove metal lids.", "• Do not break."],
         note: "⚠️ Light bulbs and mirrors are NOT recyclable glass."
     }
 };
@@ -50,19 +50,25 @@ async function loop() {
 async function predict() {
     const prediction = await model.predict(webcam.canvas);
     
-    // Refresh the probability box
-    labelContainer.innerHTML = "";
+    // BACKUP: Re-select labelContainer if it's lost
+    if(!labelContainer) labelContainer = document.getElementById("label-container");
+    
+    labelContainer.innerHTML = ""; // Clear the box
+
     for (let i = 0; i < maxPredictions; i++) {
         const p = prediction[i];
         const percent = (p.probability * 100).toFixed(0);
         
+        // Directly creating the probability text
         const row = document.createElement("div");
-        row.className = "prob-row";
-        row.innerHTML = `<span>${p.className}</span> <span>${percent}%</span>`;
+        row.style.display = "flex";
+        row.style.justifyContent = "space-between";
+        row.style.color = "#2e8b57";
+        row.style.marginBottom = "2px";
+        row.innerHTML = `<span>${p.className}:</span> <strong>${percent}%</strong>`;
         labelContainer.appendChild(row);
 
-        // Logic to trigger actions
-        if (p.probability > 0.92 && lastDetected !== p.className) {
+        if (p.probability > 0.90 && lastDetected !== p.className) {
             lastDetected = p.className;
             showModal(p.className);
             updateBins(p.className);
