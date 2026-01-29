@@ -3,87 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Smart Waste Management</title>
+    <title>EcoSmart | Home</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <header>
+        <h1>EcoSmart AI</h1>
+        <p>The Future of Urban Waste Management</p>
+    </header>
 
-<header>
-    <h1>AI-Based Smart Waste Management System</h1>
-    <p>Using AI & IoT for Cleaner Cities</p>
-</header>
+    <nav>
+        <a href="index.html">Home</a>
+        <a href="dashboard.html">AI Smart Bin</a>
+        <a href="login.html">Login/Sign Up</a>
+    </nav>
 
-<nav>
-    <a href="#dashboard">Dashboard</a>
-</nav>
-
-<section id="dashboard">
-    <h2 class="ai-title">🤖 AI Smart Bin Dashboard</h2>
-    <div class="stats-bar">
-    <div class="stat-card">🔥 Streak: <span id="streak-count">0</span> Days</div>
-    <div class="stat-card">🌱 Eco-Points: <span id="eco-points">0</span></div>
-    <div class="stat-card">📊 Weekly Empties: <span id="empty-count">0</span></div>
-</div>
-
-<div id="disposalModal" class="modal">
-    <div class="modal-content">
-        <span class="close-btn" onclick="closeModal()">&times;</span>
-        <h2 id="wasteTitle"></h2>
-        <ul id="disposalList"></ul>
-        <div id="specialNote"></div>
-        <hr>
-        <button class="btn-main" onclick="reportError()" style="background:#95a5a6; font-size:12px;">❌ AI Got it Wrong?</button>
-        <button class="btn-main" onclick="confirmDisposal()" style="margin-top:15px; width:100%;">Confirm Disposal</button>
-    </div>
-</div>
-
-<div id="error-log-section" style="margin-top: 20px; font-size: 14px; color: #666;">
-    <h3>⚠️ AI Refinement Log</h3>
-    <ul id="error-list" style="list-style:none; padding:0;"></ul>
-</div>
-
-    <div class="ai-camera-box">
-        <button class="btn-main" onclick="init()">Start AI Camera</button>
-        <div id="webcam-container"></div>
-        
-        <div id="label-container" class="probability-box">
-            <p style="color: #666; margin: 0;">AI live analysis will appear here...</p>
+    <section style="padding: 40px; max-width: 800px; margin: auto;">
+        <h2>Welcome to the Smart Waste Revolution</h2>
+        <p>Our AI-powered system helps you sort waste accurately and rewards you with Eco-Points.</p>
+        <div style="margin-top: 20px;">
+            <a href="login.html" class="btn-main" style="text-decoration: none;">Get Started</a>
         </div>
-    </div>
-
-    <div style="text-align: center; margin-bottom: 20px;">
-        <button class="btn-main" style="background: #e74c3c;" onclick="resetAllBins()">🧹 Empty All Bins</button>
-    </div>
-
-    <div class="bin-container">
-        <div class="bin"><h3>Plastic</h3><div class="progress"><div class="progress-fill" id="fill1"></div></div><p id="bin1">AI Status: Empty</p></div>
-        <div class="bin"><h3>Organic</h3><div class="progress"><div class="progress-fill" id="fill2"></div></div><p id="bin2">AI Status: Empty</p></div>
-        <div class="bin"><h3>Paper</h3><div class="progress"><div class="progress-fill" id="fill3"></div></div><p id="bin3">AI Status: Empty</p></div>
-        <div class="bin"><h3>Metal</h3><div class="progress"><div class="progress-fill" id="fill4"></div></div><p id="bin4">AI Status: Empty</p></div>
-        <div class="bin"><h3>Glass</h3><div class="progress"><div class="progress-fill" id="fill5"></div></div><p id="bin5">AI Status: Empty</p></div>
-    </div>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-<div class="chart-container">
-    <h3>📈 Weekly Eco-Progress</h3>
-    <canvas id="ecoChart"></canvas>
-</div>
-</section>
-
-<div id="disposalModal" class="modal">
-    <div class="modal-content">
-        <span class="close-btn" onclick="closeModal()">&times;</span>
-        <h2 id="wasteTitle" style="color: #2e8b57;"></h2>
-        <ul id="disposalList"></ul>
-        <div id="specialNote"></div>
-        <button class="btn-main" onclick="closeModal()" style="margin-top:15px;">Confirm Disposal</button>
-    </div>
-</div>
-
-<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest/dist/tf.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@latest/dist/teachablemachine-image.min.js"></script>
-<script src="script.js"></script>
+    </section>
 </body>
 </html>
-
-
