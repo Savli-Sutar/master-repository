@@ -1,10 +1,11 @@
 // 1. CONFIGURATION & STATE
+// Replace this URL with your actual Teachable Machine model link if it changes
 const URL = "https://teachablemachine.withgoogle.com/models/CPn8HY5wC/"; 
 let model, webcam, labelContainer, maxPredictions, ecoChart;
 let lastDetected = "";
 let currentDetectedType = "";
 
-// Load stats from LocalStorage (keeps data after refresh)
+// Load stats from LocalStorage to keep data after page refresh
 let points = parseInt(localStorage.getItem("ecoPoints") || 0);
 let empties = parseInt(localStorage.getItem("emptyCount") || 0);
 
@@ -42,7 +43,7 @@ async function init() {
         labelContainer = document.getElementById("label-container");
     } catch (error) {
         container.innerHTML = "<p style='color:red;'>Error loading camera. Check permissions.</p>";
-        console.error(error);
+        console.error("Camera Error:", error);
     }
 }
 
@@ -55,23 +56,24 @@ async function loop() {
 // 3. AI PREDICTION LOGIC
 async function predict() {
     const prediction = await model.predict(webcam.canvas);
-    labelContainer.innerHTML = ""; 
     
-    for (let i = 0; i < maxPredictions; i++) {
-        const p = prediction[i];
-        
-        // Show probabilities in the UI
-        const row = document.createElement("div");
-        row.style.fontSize = "12px";
-        row.innerHTML = `${p.className}: ${(p.probability * 100).toFixed(0)}%`;
-        labelContainer.appendChild(row);
+    // Clear and update probability UI
+    if (labelContainer) {
+        labelContainer.innerHTML = ""; 
+        for (let i = 0; i < maxPredictions; i++) {
+            const p = prediction[i];
+            const row = document.createElement("div");
+            row.style.fontSize = "12px";
+            row.innerHTML = `${p.className}: ${(p.probability * 100).toFixed(0)}%`;
+            labelContainer.appendChild(row);
 
-        // Trigger detection at 90% confidence
-        if (p.probability > 0.90 && lastDetected !== p.className) {
-            lastDetected = p.className;
-            currentDetectedType = p.className;
-            showModal(p.className);
-            updateBins(p.className);
+            // Trigger detection if confidence is over 90% and it's a new item
+            if (p.probability > 0.90 && lastDetected !== p.className) {
+                lastDetected = p.className;
+                currentDetectedType = p.className;
+                showModal(p.className);
+                updateBins(p.className);
+            }
         }
     }
 }
@@ -91,6 +93,7 @@ function showModal(type) {
 function updateBins(type) {
     const name = type.toLowerCase().trim();
     let id = 0;
+    
     if (name.includes("plastic")) id = 1;
     else if (name.includes("organic")) id = 2;
     else if (name.includes("paper")) id = 3;
@@ -109,20 +112,25 @@ function updateBins(type) {
 }
 
 function resetAllBins() {
+    // Loop through all 5 bins to reset them
     for (let i = 1; i <= 5; i++) {
         const fill = document.getElementById("fill" + i);
         const status = document.getElementById("bin" + i);
         if (fill) fill.style.width = "0%";
         if (status) {
             status.innerText = "Status: Empty";
-            status.style.color = "#333";
+            status.style.color = "#333"; // Back to default color
         }
     }
+    
+    // Increment 'Weekly Empties' counter
     empties++;
     localStorage.setItem("emptyCount", empties);
     updateDisplay();
-    lastDetected = ""; // Clear memory so AI can re-scan
-    alert("Bins emptied! Your progress has been logged.");
+    
+    // Reset AI memory so it can detect the same item again if needed
+    lastDetected = ""; 
+    alert("Bins emptied! Your cleaning effort has been logged.");
 }
 
 // 5. STATS & ERRORS
@@ -135,10 +143,15 @@ function confirmDisposal() {
 
 function reportError() {
     let errors = JSON.parse(localStorage.getItem("errorLog") || "[]");
-    errors.push(`❌ Misidentified ${currentDetectedType} (${new Date().toLocaleTimeString()})`);
+    const timestamp = new Date().toLocaleTimeString();
+    errors.push(`❌ Misidentified ${currentDetectedType || "Item"} (${timestamp})`);
+    
+    // Keep only the last 5 errors
+    if (errors.length > 5) errors.shift();
+    
     localStorage.setItem("errorLog", JSON.stringify(errors));
     loadErrorLog();
-    alert("Error recorded in the refinement log. Please sort manually.");
+    alert("Warning: Error logged. Please sort manually to maintain accuracy!");
     closeModal();
 }
 
@@ -146,35 +159,44 @@ function loadErrorLog() {
     const list = document.getElementById("error-list");
     if (!list) return;
     const errors = JSON.parse(localStorage.getItem("errorLog") || "[]");
-    list.innerHTML = errors.slice(-3).map(e => `<li>${e}</li>`).join("");
+    list.innerHTML = errors.map(e => `<li>${e}</li>`).join("");
 }
 
 function closeModal() {
     document.getElementById("disposalModal").style.display = "none";
-    // Short delay before AI can trigger the same item again
+    // Short delay before AI re-arms to prevent instant double-triggering
     setTimeout(() => { lastDetected = ""; }, 3000);
 }
 
 function updateDisplay() {
     if (document.getElementById("eco-points")) document.getElementById("eco-points").innerText = points;
     if (document.getElementById("empty-count")) document.getElementById("empty-count").innerText = empties;
+    if (document.getElementById("streak-count")) document.getElementById("streak-count").innerText = "1"; // Default
 }
 
-// 6. CHARTING
+// 6. CHARTING (Weekly Progress)
 function initChart() {
     const ctx = document.getElementById('ecoChart');
     if (!ctx) return;
+    
     new Chart(ctx.getContext('2d'), {
         type: 'line',
         data: {
             labels: ['M', 'T', 'W', 'T', 'F', 'S', 'S'],
             datasets: [{ 
-                label: 'Points', 
+                label: 'Eco-Points', 
                 data: [0, 0, 0, 0, 0, 0, points], 
                 borderColor: '#2e8b57',
+                backgroundColor: 'rgba(46, 139, 87, 0.1)',
+                fill: true,
                 tension: 0.3
             }]
         },
-        options: { responsive: true }
+        options: { 
+            responsive: true,
+            scales: {
+                y: { beginAtZero: true }
+            }
+        }
     });
 }
