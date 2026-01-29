@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EcoSmart | Login</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header>
+    <h1 id="auth-header">Welcome Back</h1>
+    <p id="auth-subheader">Sign in to save your Eco-Points and track progress</p>
+</header>
+
+<nav>
+    <a href="index.html">Home</a>
+    <a href="dashboard.html">AI Dashboard</a>
+</nav>
+
+<div class="section-container">
+    <div class="ai-camera-box" style="width: 100%; max-width: 400px; margin: 40px auto; padding: 30px;">
+        <h2 id="auth-title" style="color: #2e8b57; margin-bottom: 20px;">Login</h2>
+        
+        <div id="auth-form">
+            <input type="email" id="email" placeholder="Email Address" required 
+                   style="width: 90%; padding: 12px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 5px;">
+            
+            <input type="password" id="password" placeholder="Password" required 
+                   style="width: 90%; padding: 12px; margin-bottom: 20px; border: 1px solid #ddd; border-radius: 5px;">
+            
+            <button class="btn-main" id="auth-btn" style="width: 100%;" onclick="handleAuth()">
+                Enter Dashboard
+            </button>
+        </div>
+
+        <p style="margin-top: 25px; font-size: 14px; color: #666;">
+            <span id="toggle-text">Don't have an account?</span> 
+            <a href="javascript:void(0)" onclick="toggleAuthMode()" id="toggle-link" 
+               style="color: #2e8b57; font-weight: bold; text-decoration: none; margin-left: 5px;">Sign Up</a>
+        </p>
+    </div>
+
+    <div style="margin-top: 20px;">
+        <a href="index.html" style="color: #888; text-decoration: none; font-size: 14px;">← Return to Homepage</a>
+    </div>
+</div>
+
+<script>
+    let isLoginMode = true;
+
+    function toggleAuthMode() {
+        isLoginMode = !isLoginMode;
+        
+        const title = document.getElementById('auth-title');
+        const header = document.getElementById('auth-header');
+        const subheader = document.getElementById('auth-subheader');
+        const btn = document.getElementById('auth-btn');
+        const text = document.getElementById('toggle-text');
+        const link = document.getElementById('toggle-link');
+
+        if (isLoginMode) {
+            title.innerText = "Login";
+            header.innerText = "Welcome Back";
+            subheader.innerText = "Sign in to save your Eco-Points and track progress";
+            btn.innerText = "Enter Dashboard";
+            text.innerText = "Don't have an account?";
+            link.innerText = "Sign Up";
+        } else {
+            title.innerText = "Create Account";
+            header.innerText = "Join the Movement";
+            subheader.innerText = "Start earning rewards for smart recycling";
+            btn.innerText = "Register Now";
+            text.innerText = "Already a member?";
+            link.innerText = "Login";
+        }
+    }
+
+    function handleAuth() {
+        // Simple validation check
+        const email = document.getElementById('email').value;
+        const pass = document.getElementById('password').value;
+
+        if (email && pass) {
+            // For now, we redirect to the dashboard. 
+            // Later, we can connect this to Firebase for real security.
+            window.location.href = "dashboard.html";
+        } else {
+            alert("Please enter both email and password.");
+        }
+    }
+</script>
+
+</body>
+</html>
