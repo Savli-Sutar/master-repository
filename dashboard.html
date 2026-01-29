@@ -3,14 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Smart Waste Management</title>
+    <title>AI Smart Bin Dashboard</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
 <header>
-    <h1>AI-Based Smart Waste Management System</h1>
-    <p>Using AI & IoT for Cleaner Cities</p>
+    <h1>AI-Based Smart Waste Management</h1>
 </header>
 
 <nav>
@@ -18,10 +17,9 @@
     <a href="#dashboard">Dashboard</a>
 </nav>
 
-<section id="dashboard">
-    <h2 class="ai-title">🤖 AI Smart Bin Dashboard</h2>
+<section id="dashboard" class="section-container">
     <div class="stats-bar">
-        <div class="stat-card">🔥 Streak: <span id="streak-count">0</span> Days</div>
+        <div class="stat-card">🔥 Streak: <span id="streak-count">0</span></div>
         <div class="stat-card">🌱 Eco-Points: <span id="eco-points">0</span></div>
         <div class="stat-card">📊 Weekly Empties: <span id="empty-count">0</span></div>
     </div>
@@ -35,11 +33,11 @@
     </div>
 
     <div class="bin-container">
-        <div class="bin"><h3>Plastic</h3><div class="progress"><div class="progress-fill" id="fill1"></div></div><p id="bin1">AI Status: Empty</p></div>
-        <div class="bin"><h3>Organic</h3><div class="progress"><div class="progress-fill" id="fill2"></div></div><p id="bin2">AI Status: Empty</p></div>
-        <div class="bin"><h3>Paper</h3><div class="progress"><div class="progress-fill" id="fill3"></div></div><p id="bin3">AI Status: Empty</p></div>
-        <div class="bin"><h3>Metal</h3><div class="progress"><div class="progress-fill" id="fill4"></div></div><p id="bin4">AI Status: Empty</p></div>
-        <div class="bin"><h3>Glass</h3><div class="progress"><div class="progress-fill" id="fill5"></div></div><p id="bin5">AI Status: Empty</p></div>
+        <div class="bin"><h3>Plastic</h3><div class="progress"><div class="progress-fill" id="fill1"></div></div><p id="bin1">Status: Empty</p></div>
+        <div class="bin"><h3>Organic</h3><div class="progress"><div class="progress-fill" id="fill2"></div></div><p id="bin2">Status: Empty</p></div>
+        <div class="bin"><h3>Paper</h3><div class="progress"><div class="progress-fill" id="fill3"></div></div><p id="bin3">Status: Empty</p></div>
+        <div class="bin"><h3>Metal</h3><div class="progress"><div class="progress-fill" id="fill4"></div></div><p id="bin4">Status: Empty</p></div>
+        <div class="bin"><h3>Glass</h3><div class="progress"><div class="progress-fill" id="fill5"></div></div><p id="bin5">Status: Empty</p></div>
     </div>
 
     <div class="chart-container">
@@ -48,10 +46,19 @@
     </div>
 </section>
 
+<div id="disposalModal" class="modal">
+    <div class="modal-content">
+        <span class="close-btn" onclick="closeModal()">&times;</span>
+        <h2 id="wasteTitle" style="color: #2e8b57;"></h2>
+        <ul id="disposalList"></ul>
+        <div id="specialNote"></div>
+        <button class="btn-main" onclick="confirmDisposal()" style="margin-top:15px; width:100%;">Confirm Disposal</button>
+    </div>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest/dist/tf.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@latest/dist/teachablemachine-image.min.js"></script>
-<script src="script.js"></script> 
 <script src="script.js"></script>
 </body>
 </html>
