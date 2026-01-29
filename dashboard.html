@@ -31,16 +31,17 @@
             <p style="color: #666; margin: 0;">AI live analysis will appear here...</p>
         </div>
     </div>
+
     <div style="text-align: center; margin: 20px 0;">
-    <button class="btn-main" style="background: #e74c3c;" onclick="resetAllBins()">
-        🧹 Empty All Bins
-    </button>
-</div>
-    <div style="text-align: center; margin: 20px 0;">
-    <button class="btn-main" style="background: #e74c3c; border: 2px solid #c0392b;" onclick="resetAllBins()">
-        🧹 Empty All Bins
-    </button>
-</div>
+        <button class="btn-main" style="background: #e74c3c; border: 2px solid #c0392b;" onclick="resetAllBins()">
+            🧹 Empty All Bins
+        </button>
+    </div>
+
+    <div id="error-log-section" style="margin-bottom: 20px; font-size: 14px; color: #666;">
+        <strong>⚠️ AI Refinement Log:</strong>
+        <ul id="error-list" style="list-style:none; padding:0; display: inline-flex; gap: 10px; color: #d9534f;"></ul>
+    </div>
 
     <div class="bin-container">
         <div class="bin"><h3>Plastic</h3><div class="progress"><div class="progress-fill" id="fill1"></div></div><p id="bin1">Status: Empty</p></div>
