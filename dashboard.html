@@ -48,14 +48,21 @@
 
 <div id="disposalModal" class="modal">
     <div class="modal-content">
-        <button onclick="wrongDetection()" style="background: none; border: none; color: #666; cursor: pointer; text-decoration: underline; margin-top: 10px;">
-    AI is wrong? Report error
-</button>
         <span class="close-btn" onclick="closeModal()">&times;</span>
-        <h2 id="wasteTitle" style="color: #2e8b57;"></h2>
-        <ul id="disposalList"></ul>
-        <div id="specialNote"></div>
-        <button class="btn-main" onclick="confirmDisposal()" style="margin-top:15px; width:100%;">Confirm Disposal</button>
+        
+        <h2 id="wasteTitle" style="color: #2e8b57;">Detection Result</h2>
+        
+        <ul id="disposalList"></ul> 
+        
+        <div id="specialNote" style="font-style: italic; color: #d9534f; margin-top: 10px; background: #fff3cd; padding: 5px; border-radius: 4px;"></div>
+        
+        <hr style="margin: 15px 0; border: 0; border-top: 1px solid #eee;">
+        
+        <button class="btn-main" onclick="confirmDisposal()" style="width:100%;">I Disposed Correctly</button>
+        
+        <button onclick="reportError()" style="background: none; border: none; color: #666; cursor: pointer; text-decoration: underline; margin-top: 15px; width: 100%; font-size: 13px;">
+            ❌ AI Got it Wrong? Report Error
+        </button>
     </div>
 </div>
 
@@ -63,13 +70,6 @@
 <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest/dist/tf.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@latest/dist/teachablemachine-image.min.js"></script>
 <script src="script.js"></script>
-    <div id="disposalModal" class="modal">
-    <div class="modal-content">
-        <span class="close-btn" onclick="closeModal()">&times;</span>
-        <h2 id="wasteTitle" style="color: #2e8b57;">Detection Result</h2>
-        <ul id="disposalList"></ul> <div id="specialNote" style="font-style: italic; color: #d9534f; margin-top: 10px;"></div>
-        <button class="btn-main" onclick="confirmDisposal()" style="margin-top:15px; width:100%;">I Disposed Correctly</button>
-    </div>
-</div>
+
 </body>
 </html>
