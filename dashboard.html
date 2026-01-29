@@ -60,5 +60,13 @@
 <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest/dist/tf.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@latest/dist/teachablemachine-image.min.js"></script>
 <script src="script.js"></script>
+    <div id="disposalModal" class="modal">
+    <div class="modal-content">
+        <span class="close-btn" onclick="closeModal()">&times;</span>
+        <h2 id="wasteTitle" style="color: #2e8b57;">Detection Result</h2>
+        <ul id="disposalList"></ul> <div id="specialNote" style="font-style: italic; color: #d9534f; margin-top: 10px;"></div>
+        <button class="btn-main" onclick="confirmDisposal()" style="margin-top:15px; width:100%;">I Disposed Correctly</button>
+    </div>
+</div>
 </body>
 </html>
