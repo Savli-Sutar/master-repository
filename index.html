@@ -19,6 +19,28 @@
 
 <section id="dashboard">
     <h2 class="ai-title">🤖 AI Smart Bin Dashboard</h2>
+    <div class="stats-bar">
+    <div class="stat-card">🔥 Streak: <span id="streak-count">0</span> Days</div>
+    <div class="stat-card">🌱 Eco-Points: <span id="eco-points">0</span></div>
+    <div class="stat-card">📊 Weekly Empties: <span id="empty-count">0</span></div>
+</div>
+
+<div id="disposalModal" class="modal">
+    <div class="modal-content">
+        <span class="close-btn" onclick="closeModal()">&times;</span>
+        <h2 id="wasteTitle"></h2>
+        <ul id="disposalList"></ul>
+        <div id="specialNote"></div>
+        <hr>
+        <button class="btn-main" onclick="reportError()" style="background:#95a5a6; font-size:12px;">❌ AI Got it Wrong?</button>
+        <button class="btn-main" onclick="confirmDisposal()" style="margin-top:15px; width:100%;">Confirm Disposal</button>
+    </div>
+</div>
+
+<div id="error-log-section" style="margin-top: 20px; font-size: 14px; color: #666;">
+    <h3>⚠️ AI Refinement Log</h3>
+    <ul id="error-list" style="list-style:none; padding:0;"></ul>
+</div>
 
     <div class="ai-camera-box">
         <button class="btn-main" onclick="init()">Start AI Camera</button>
@@ -57,3 +79,4 @@
 <script src="script.js"></script>
 </body>
 </html>
+
