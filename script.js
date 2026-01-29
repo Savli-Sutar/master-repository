@@ -1,6 +1,6 @@
 // 1. CONFIGURATION & STATE
 const URL = "https://teachablemachine.withgoogle.com/models/CPn8HY5wC/"; 
-let model, webcam, labelContainer, maxPredictions;
+let model, webcam, labelContainer, maxPredictions, ecoChart;
 let lastDetected = "";
 let currentDetectedType = "";
 
@@ -21,6 +21,7 @@ document.addEventListener("DOMContentLoaded", () => {
     updateDisplay();
     checkStreak();
     loadErrorLog();
+    initChart();
 });
 
 async function init() {
@@ -58,7 +59,6 @@ async function predict() {
         row.innerHTML = `<span>${p.className}:</span> <strong>${percent}%</strong>`;
         labelContainer.appendChild(row);
 
-        // Threshold of 90% accuracy to trigger bin/modal
         if (p.probability > 0.90 && lastDetected !== p.className) {
             lastDetected = p.className;
             currentDetectedType = p.className;
@@ -68,19 +68,58 @@ async function predict() {
     }
 }
 
-// 4. HABIT & STATS LOGIC
+// 4. CHART.JS LOGIC
+function initChart() {
+    const ctx = document.getElementById('ecoChart').getContext('2d');
+    const weeklyData = JSON.parse(localStorage.getItem("weeklyPoints") || "[0, 0, 0, 0, 0, 0, 0]");
+
+    ecoChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+            datasets: [{
+                label: 'Eco-Points Growth',
+                data: weeklyData,
+                borderColor: '#2e8b57',
+                backgroundColor: 'rgba(46, 139, 87, 0.1)',
+                fill: true,
+                tension: 0.4,
+                borderWidth: 3
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: { y: { beginAtZero: true } }
+        }
+    });
+}
+
+function updateWeeklyData(earnedPoints) {
+    let data = JSON.parse(localStorage.getItem("weeklyPoints") || "[0, 0, 0, 0, 0, 0, 0]");
+    let dayIndex = new Date().getDay(); 
+    let adjustedIndex = dayIndex === 0 ? 6 : dayIndex - 1; // Adjust Sunday from 0 to 6
+    
+    data[adjustedIndex] += earnedPoints;
+    localStorage.setItem("weeklyPoints", JSON.stringify(data));
+    
+    ecoChart.data.datasets[0].data = data;
+    ecoChart.update();
+}
+
+// 5. HABIT & STATS LOGIC
 function checkStreak() {
     const lastDate = localStorage.getItem("lastScanDate");
     const today = new Date().toDateString();
     let streak = parseInt(localStorage.getItem("scanStreak") || 0);
 
     if (lastDate !== today) {
-        // If yesterday was the last scan, increment. If not, reset to 1.
         const yesterday = new Date();
         yesterday.setDate(yesterday.getDate() - 1);
         
         if (lastDate === yesterday.toDateString()) {
             streak++;
+        } else if (!lastDate) {
+            streak = 1;
         } else {
             streak = 1; 
         }
@@ -96,7 +135,7 @@ function updateDisplay() {
     document.getElementById("streak-count").innerText = localStorage.getItem("scanStreak") || 0;
 }
 
-// 5. UI ACTIONS (Modals & Bins)
+// 6. UI ACTIONS
 function showModal(type) {
     const data = disposalData[type];
     if (!data) return;
@@ -114,12 +153,13 @@ function showModal(type) {
 
 function confirmDisposal() {
     const pointValues = { "Plastic": 10, "Organic": 5, "Paper": 5, "Metal": 10, "Glass": 10 };
-    points += (pointValues[currentDetectedType] || 0);
+    const earned = (pointValues[currentDetectedType] || 0);
+    
+    points += earned;
     localStorage.setItem("ecoPoints", points);
+    updateWeeklyData(earned);
     
-    // Check streak again on every scan to ensure it's recorded
     localStorage.setItem("lastScanDate", new Date().toDateString());
-    
     updateDisplay();
     closeModal();
 }
@@ -141,7 +181,6 @@ function updateBins(type) {
     }
 }
 
-// 6. SYSTEM MAINTENANCE
 function resetAllBins() {
     for (let i = 1; i <= 5; i++) {
         document.getElementById("fill" + i).style.width = "0%";
@@ -156,11 +195,11 @@ function resetAllBins() {
 
 function reportError() {
     let errors = JSON.parse(localStorage.getItem("errorLog") || "[]");
-    const errorEntry = `Misidentified ${currentDetectedType} (${new Date().toLocaleTimeString()})`;
+    const errorEntry = `❌ Misidentified ${currentDetectedType} (${new Date().toLocaleTimeString()})`;
     errors.push(errorEntry);
     localStorage.setItem("errorLog", JSON.stringify(errors));
     loadErrorLog();
-    alert("Logged! Please add more " + currentDetectedType + " images to your training data.");
+    alert("Error recorded in the refinement log.");
     closeModal();
 }
 
@@ -173,6 +212,5 @@ function loadErrorLog() {
 
 function closeModal() {
     document.getElementById("disposalModal").style.display = "none";
-    // Short delay before AI resumes detection to prevent instant re-trigger
     setTimeout(() => { lastDetected = ""; }, 3000);
 }
