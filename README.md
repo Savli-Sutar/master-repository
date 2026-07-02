@@ -1,0 +1,1 @@
+This project demonstrates the use of AI in machine learning and training it to implement and deploy for practical use. In this particular project, AI is used to build and optimiize a smart waste management system which features implementation of camera to detect the type of waste and methods to segregate and instruct user for proper disposal
